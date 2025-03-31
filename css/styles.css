@@ -1,0 +1,474 @@
+/* Reset en basis stijlen */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+}
+
+body {
+  background-color: #f5f7fa;
+  padding: 20px;
+  color: #333;
+}
+
+/* Algemene container stijlen met browser compatibiliteit */
+.container {
+  margin: 0 auto;
+  padding: 20px;
+}
+
+/* Card stijlen met cross-browser shadows */
+.card {
+  background-color: #fff;
+  border-radius: 8px;
+  -webkit-box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 24px;
+  padding: 24px;
+}
+
+/* Titel stijlen */
+h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #2d3748;
+}
+
+h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: #4a5568;
+}
+
+/* Formulier elementen */
+.form-group {
+  margin-bottom: 16px;
+}
+
+label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+}
+
+input[type="number"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 4px;
+  font-size: 16px;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+input[type="number"]:focus,
+input[type="text"]:focus {
+  outline: none;
+  border-color: #4299e1;
+  -webkit-box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+  box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+}
+
+/* Checkbox styling met browser compatibility */
+.checkbox-container {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.checkbox-container input[type="checkbox"] {
+  margin-right: 8px;
+}
+
+/* Grid systeem met fallbacks */
+.grid {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin: -12px;
+}
+
+.grid-col-1,
+.grid-col-2,
+.grid-col-3 {
+  padding: 12px;
+  width: 100%;
+}
+
+/* Responsive grid */
+@media (min-width: 768px) {
+  .grid-col-2 {
+    width: 50%;
+  }
+
+  .grid-col-3 {
+    width: 33.333%;
+  }
+}
+
+/* Tabel styling */
+.table-container {
+  overflow-x: auto;
+  margin-top: 20px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+th,
+td {
+  padding: 12px;
+  text-align: left;
+  border: 1px solid #e2e8f0;
+}
+
+th {
+  background-color: #f7fafc;
+  font-weight: 600;
+}
+
+tr:nth-child(even) {
+  background-color: #f9fafb;
+}
+
+/* Kleur categorieën voor rendementen */
+.bg-red-800 {
+  background-color: #9b2c2c;
+  color: white;
+}
+
+.bg-red-500 {
+  background-color: #f56565;
+  color: white;
+}
+
+.bg-yellow-400 {
+  background-color: #f6e05e;
+}
+
+.bg-green-500 {
+  background-color: #48bb78;
+  color: white;
+}
+
+.bg-blue-600 {
+  background-color: #3182ce;
+  color: white;
+}
+
+/* Grafiek container */
+.chart-container {
+  height: 400px;
+  margin-top: 24px;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+/* Legenda styling */
+.legenda {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -ms-flex-wrap: wrap;
+  flex-wrap: wrap;
+  margin-top: 16px;
+  gap: 16px;
+}
+
+.legenda-item {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-align: center;
+  -ms-flex-align: center;
+  align-items: center;
+  margin-right: 16px;
+}
+
+.legenda-kleur {
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  border-radius: 2px;
+}
+
+/* Formule sectie styling */
+.formules-sectie {
+  background-color: #f7fafc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 24px;
+}
+
+.formule-item {
+  margin-bottom: 12px;
+}
+
+.formule-naam {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.formule-beschrijving {
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.formule-code {
+  background-color: #edf2f7;
+  padding: 8px;
+  border-radius: 4px;
+  font-family: monospace;
+  white-space: pre-wrap;
+  margin-bottom: 8px;
+  font-size: 14px;
+}
+
+.resultaat-blok {
+  background-color: #edf2f7;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 24px;
+}
+
+.resultaat-rij {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+  -ms-flex-pack: justify;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.resultaat-label {
+  font-weight: 500;
+}
+
+.highlight {
+  background-color: #ebf8ff;
+  padding: 2px 4px;
+  border-radius: 2px;
+}
+
+/* Knoppen styling */
+.button {
+  display: inline-block;
+  background-color: #4299e1;
+  color: white;
+  padding: 10px 16px;
+  border-radius: 4px;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  -webkit-transition: background-color 0.2s;
+  transition: background-color 0.2s;
+}
+
+.button:hover {
+  background-color: #3182ce;
+}
+
+.button-secondary {
+  background-color: #e2e8f0;
+  color: #4a5568;
+}
+
+.button-secondary:hover {
+  background-color: #cbd5e0;
+}
+
+/* Settings section */
+.settings-section {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 24px;
+}
+
+.settings-section h3 {
+  margin-bottom: 16px;
+  color: #2d3748;
+  font-size: 18px;
+}
+
+.checkbox-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 16px;
+}
+
+/* Legenda styling */
+.legenda {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.legenda-item {
+  display: flex;
+  align-items: center;
+  background-color: #f8fafc;
+  padding: 8px 12px;
+  border-radius: 4px;
+}
+
+/* Tab navigation */
+.tab-navigation {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  background-color: #e2e8f0;
+  color: #4a5568;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.tab-button.active {
+  background-color: #4299e1;
+  color: white;
+}
+
+.tab-content {
+  display: none;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+/* Layout */
+.main-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+}
+
+.settings-panel {
+  position: sticky;
+  top: 24px;
+  height: fit-content;
+}
+
+.results-panel {
+  min-width: 0; /* Voorkomt overflow problemen */
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+/* Slider styling */
+.slider {
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  border-radius: 4px;
+  background: #e2e8f0;
+  outline: none;
+  margin: 10px 0;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4299e1;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #4299e1;
+  cursor: pointer;
+  border: none;
+}
+
+/* Comfort niveaus */
+.comfort-niveaus {
+  background-color: #f8fafc;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 24px 0;
+}
+
+.comfort-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.comfort-item {
+  background-color: white;
+  padding: 12px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.comfort-label {
+  font-weight: 500;
+  color: #4a5568;
+}
+
+.comfort-item span:last-child {
+  display: block;
+  margin-top: 4px;
+  font-size: 1.1em;
+  color: #2d3748;
+}
+
+/* Tabel voor vermogensgroei */
+.table-container table th,
+.table-container table td {
+  white-space: nowrap;
+  padding: 8px 12px;
+}
+
+.table-container table th {
+  position: sticky;
+  top: 0;
+  background-color: #f7fafc;
+  z-index: 1;
+}
+
+/* Responsieve aanpassingen */
+@media (max-width: 768px) {
+  .comfort-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .charts-grid {
+    grid-template-columns: 1fr;
+  }
+}
