@@ -1,10 +1,10 @@
-  document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
             // Input elementen selecteren
             const eigenVermogenInput = document.getElementById('eigenVermogen');
             const ltvInput = document.getElementById('ltv');
             const rentePercentageInput = document.getElementById('rentePercentage');
-            const vennootschapsbelastingInput = document.getElementById('vennootschapsbelasting');
-            const rentePriveInput = document.getElementById('rentePrive');
+            const vennootschapsbelastingInput = 0.198;
+            const rentePriveInput = rentePercentageInput;
             const structuurSelect = document.getElementById('structuur');
             const holdingInstellingen = document.getElementById('holdingInstellingen');
 
@@ -26,10 +26,44 @@
             const comfortNiveau1Input = document.getElementById('comfortNiveau1');
             const comfortNiveau2Input = document.getElementById('comfortNiveau2');
             const comfortNiveau3Input = document.getElementById('comfortNiveau3');
-            const rentePriveVermogensgroeiInput = document.getElementById('rentePriveVermogensgroei');
-            const vennootschapsbelastingVermogensgroeiInput = document.getElementById('vennootschapsbelastingVermogensgroei');
-            const minimaalInkomenInput = document.getElementById('minimaalInkomen');
+           const minimaalInkomenInput = document.getElementById('minimaalInkomen');
             const minimaalInkomenInflatieInput = document.getElementById('minimaalInkomenInflatie');
+
+            // Functie om vermogensgroei waardes op te slaan
+            function saveVermogensgroeiWaarden() {
+                const waarden = {
+                    startEigenVermogen: startEigenVermogenInput.value,
+                    pandwaarde: pandwaardeInput.value,
+                    looptijd: looptijdVermogensgroeiInput.value,
+                    structuur: structuurVermogensgroeiSelect.value,
+                    ltv: ltvVermogensgroeiInput.value,
+                    rentePercentage: rentePercentageVermogensgroeiInput.value,
+                    huurrendement: huurrendementVermogensgroeiInput.value,
+                    huurstijging: huurstijgingVermogensgroeiInput.value,
+                    kostenPercentage: kostenPercentageVermogensgroeiInput.value,
+                    waardestijging: waardestijgingVermogensgroeiInput.value,
+                    inkomenHerinvestering: inkomenHerinvesteringInput.value,
+                    herinvesteerWaardestijging: herinvesteerWaardestijgingVermogensgroeiInput.checked,
+                    comfortNiveau1: comfortNiveau1Input.value,
+                    comfortNiveau2: comfortNiveau2Input.value,
+                    comfortNiveau3: comfortNiveau3Input.value,
+                    minimaalInkomen: minimaalInkomenInput.value,
+                    minimaalInkomenInflatie: minimaalInkomenInflatieInput.value,
+                };
+                localStorage.setItem('vermogensgroeiWaarden', JSON.stringify(waarden));
+            }
+
+            // Functie om scenario waardes op te slaan
+            function saveScenarioWaarden() {
+                const waarden = {
+                    eigenVermogen: eigenVermogenInput.value,
+                    ltv: ltvInput.value,
+                    rentePercentage: rentePercentageInput.value,
+                    structuur: structuurSelect.value,
+                    waardestijging: document.getElementById('waardestijging').value
+                };
+                localStorage.setItem('scenarioWaarden', JSON.stringify(waarden));
+            }
 
             // Laad opgeslagen waarden voor scenario tab
             const scenarioWaarden = JSON.parse(localStorage.getItem('scenarioWaarden') || '{}');
@@ -63,26 +97,53 @@
             if (vermogensgroeiWaarden.comfortNiveau1) comfortNiveau1Input.value = vermogensgroeiWaarden.comfortNiveau1;
             if (vermogensgroeiWaarden.comfortNiveau2) comfortNiveau2Input.value = vermogensgroeiWaarden.comfortNiveau2;
             if (vermogensgroeiWaarden.comfortNiveau3) comfortNiveau3Input.value = vermogensgroeiWaarden.comfortNiveau3;
-            if (vermogensgroeiWaarden.rentePrive) rentePriveVermogensgroeiInput.value = vermogensgroeiWaarden.rentePrive;
-            if (vermogensgroeiWaarden.vennootschapsbelasting) vennootschapsbelastingVermogensgroeiInput.value = vermogensgroeiWaarden.vennootschapsbelasting;
+            
             if (vermogensgroeiWaarden.minimaalInkomen) minimaalInkomenInput.value = vermogensgroeiWaarden.minimaalInkomen;
             if (vermogensgroeiWaarden.minimaalInkomenInflatie) minimaalInkomenInflatieInput.value = vermogensgroeiWaarden.minimaalInkomenInflatie;
 
-            // Laad laatste actieve tab
-            const laatsteTab = localStorage.getItem('laatsteTab') || 'scenario';
-            document.querySelectorAll('.tab-button').forEach(button => {
-                if (button.dataset.tab === laatsteTab) {
-                    button.classList.add('active');
-                    document.getElementById(`${button.dataset.tab}Tab`).classList.add('active');
-                } else {
-                    button.classList.remove('active');
-                    document.getElementById(`${button.dataset.tab}Tab`).classList.remove('active');
-                }
+            // Event listeners voor scenario inputs
+            [eigenVermogenInput, ltvInput, rentePercentageInput, document.getElementById('waardestijging')].forEach(input => {
+                input.addEventListener('change', () => {
+                    const resultaten = berekenScenarioResultaten();
+                    updateCharts(resultaten);
+                    updateScenarioTabel(resultaten);
+                    saveScenarioWaarden();
+                });
             });
 
-            // Initialiseer holding instellingen
-            holdingInstellingen.style.display = 'none';
-            holdingInstellingenVermogensgroei.style.display = 'none';
+            // Event listeners voor vermogensgroei inputs
+            [startEigenVermogenInput, pandwaardeInput, looptijdVermogensgroeiInput,
+             ltvVermogensgroeiInput, rentePercentageVermogensgroeiInput, huurrendementVermogensgroeiInput,
+             huurstijgingVermogensgroeiInput, kostenPercentageVermogensgroeiInput, waardestijgingVermogensgroeiInput,
+             herinvesteerWaardestijgingVermogensgroeiInput, comfortNiveau1Input, comfortNiveau2Input,
+             comfortNiveau3Input, minimaalInkomenInput, minimaalInkomenInflatieInput].forEach(input => {
+                input.addEventListener('change', () => {
+                    berekenVermogensgroei();
+                    saveVermogensgroeiWaarden();
+                });
+            });
+
+            // Update slider waarde display
+            inkomenHerinvesteringInput.addEventListener('input', () => {
+                inkomenHerinvesteringValue.textContent = `${inkomenHerinvesteringInput.value}%`;
+                berekenVermogensgroei();
+                saveVermogensgroeiWaarden();
+            });
+
+            // Structuur wijziging handlers
+            structuurSelect.addEventListener('change', () => {
+                holdingInstellingen.style.display = structuurSelect.value === 'holding' ? 'block' : 'none';
+                const resultaten = berekenScenarioResultaten();
+                updateCharts(resultaten);
+                updateScenarioTabel(resultaten);
+                saveScenarioWaarden();
+            });
+
+            structuurVermogensgroeiSelect.addEventListener('change', () => {
+                holdingInstellingenVermogensgroei.style.display = structuurVermogensgroeiSelect.value === 'holding' ? 'block' : 'none';
+                berekenVermogensgroei();
+                saveVermogensgroeiWaarden();
+            });
 
             // Tab navigatie
             const tabButtons = document.querySelectorAll('.tab-button');
@@ -98,77 +159,19 @@
                 });
             });
 
-            // Event listeners voor scenario inputs
-            [eigenVermogenInput, ltvInput, rentePercentageInput, vennootschapsbelastingInput, rentePriveInput, document.getElementById('waardestijging')].forEach(input => {
-                input.addEventListener('input', () => {
-                    const resultaten = berekenScenarioResultaten();
-                    updateCharts(resultaten);
-                    updateScenarioTabel(resultaten);
-                    localStorage.setItem('scenarioWaarden', JSON.stringify({
-                        eigenVermogen: eigenVermogenInput.value,
-                        ltv: ltvInput.value,
-                        rentePercentage: rentePercentageInput.value,
-                        vennootschapsbelasting: vennootschapsbelastingInput.value,
-                        rentePrive: rentePriveInput.value,
-                        structuur: structuurSelect.value,
-                        waardestijging: document.getElementById('waardestijging').value
-                    }));
-                });
+            // Laad laatste actieve tab
+            const laatsteTab = localStorage.getItem('laatsteTab') || 'scenario';
+            document.querySelectorAll('.tab-button').forEach(button => {
+                if (button.dataset.tab === laatsteTab) {
+                    button.classList.add('active');
+                    document.getElementById(`${button.dataset.tab}Tab`).classList.add('active');
+                } else {
+                    button.classList.remove('active');
+                    document.getElementById(`${button.dataset.tab}Tab`).classList.remove('active');
+                }
             });
 
-            // Event listeners voor vermogensgroei inputs
-            [startEigenVermogenInput, pandwaardeInput, looptijdVermogensgroeiInput,
-             ltvVermogensgroeiInput, rentePercentageVermogensgroeiInput, huurrendementVermogensgroeiInput,
-             huurstijgingVermogensgroeiInput, kostenPercentageVermogensgroeiInput, waardestijgingVermogensgroeiInput,
-             herinvesteerWaardestijgingVermogensgroeiInput, comfortNiveau1Input, comfortNiveau2Input,
-             comfortNiveau3Input, rentePriveVermogensgroeiInput, vennootschapsbelastingVermogensgroeiInput,
-             minimaalInkomenInput, minimaalInkomenInflatieInput].forEach(input => {
-                input.addEventListener('input', () => {
-                    berekenVermogensgroei();
-                    localStorage.setItem('vermogensgroeiWaarden', JSON.stringify({
-                        startEigenVermogen: startEigenVermogenInput.value,
-                        pandwaarde: pandwaardeInput.value,
-                        looptijd: looptijdVermogensgroeiInput.value,
-                        structuur: structuurVermogensgroeiSelect.value,
-                        ltv: ltvVermogensgroeiInput.value,
-                        rentePercentage: rentePercentageVermogensgroeiInput.value,
-                        huurrendement: huurrendementVermogensgroeiInput.value,
-                        huurstijging: huurstijgingVermogensgroeiInput.value,
-                        kostenPercentage: kostenPercentageVermogensgroeiInput.value,
-                        waardestijging: waardestijgingVermogensgroeiInput.value,
-                        inkomenHerinvestering: inkomenHerinvesteringInput.value,
-                        herinvesteerWaardestijging: herinvesteerWaardestijgingVermogensgroeiInput.checked,
-                        comfortNiveau1: comfortNiveau1Input.value,
-                        comfortNiveau2: comfortNiveau2Input.value,
-                        comfortNiveau3: comfortNiveau3Input.value,
-                        rentePrive: rentePriveVermogensgroeiInput.value,
-                        vennootschapsbelasting: vennootschapsbelastingVermogensgroeiInput.value,
-                        minimaalInkomen: minimaalInkomenInput.value,
-                        minimaalInkomenInflatie: minimaalInkomenInflatieInput.value
-                    }));
-                });
-            });
-
-            // Update slider waarde display
-            inkomenHerinvesteringInput.addEventListener('input', () => {
-                inkomenHerinvesteringValue.textContent = `${inkomenHerinvesteringInput.value}%`;
-                berekenVermogensgroei();
-            });
-
-            // Structuur wijziging handlers
-            structuurSelect.addEventListener('change', () => {
-                holdingInstellingen.style.display = structuurSelect.value === 'holding' ? 'block' : 'none';
-                const resultaten = berekenScenarioResultaten();
-                updateCharts(resultaten);
-                updateScenarioTabel(resultaten);
-            });
-
-            structuurVermogensgroeiSelect.addEventListener('change', () => {
-                holdingInstellingenVermogensgroei.style.display = structuurVermogensgroeiSelect.value === 'holding' ? 'block' : 'none';
-                berekenVermogensgroei();
-            });
-      
-        // Initialiseer berekeningen
+            // Initialiseer berekeningen
             const resultaten = berekenScenarioResultaten();
             updateCharts(resultaten);
             updateScenarioTabel(resultaten);

@@ -2,17 +2,18 @@
 
 function berekenScenarioResultaten() {
     const eigenVermogen = parseFloat(document.getElementById('eigenVermogen').value);
+    const gemiddeldePandwaarde = parseFloat(document.getElementById('pandwaarde').value);
     const ltv = parseFloat(document.getElementById('ltv').value) / 100;
     const rentePercentage = parseFloat(document.getElementById('rentePercentage').value) / 100;
-    const vennootschapsbelasting = parseFloat(document.getElementById('vennootschapsbelasting').value) / 100;
-    const rentePrive = parseFloat(document.getElementById('rentePrive').value) / 100;
+    const vennootschapsbelasting = 0.198;
+    const rentePrive = rentePercentage;
     const isHolding = document.getElementById('structuur').value === 'holding';
     const waardestijging = parseFloat(document.getElementById('waardestijging').value) / 100;
 
     // Bereken initiële situatie
     const totaleVastgoedwaarde = eigenVermogen / (1 - ltv);
     const hypotheek = totaleVastgoedwaarde - eigenVermogen;
-    const aantalWoningen = Math.ceil(totaleVastgoedwaarde / 400000);
+    const aantalWoningen = Math.floor(totaleVastgoedwaarde / gemiddeldePandwaarde);
 
     // Bereken verschillende scenario's
     const scenarios = [];
@@ -75,7 +76,7 @@ function berekenVermogensgroei() {
     // Bereken initiële situatie
     const totaleVastgoedwaarde = startEigenVermogen / (1 - ltv);
     const hypotheek = totaleVastgoedwaarde - startEigenVermogen;
-    const aantalWoningen = Math.ceil(totaleVastgoedwaarde / pandwaarde);
+    const aantalWoningen = Math.floor(totaleVastgoedwaarde / pandwaarde);
 
     // Bereken initieel netto inkomen
     let initieelNettoInkomen;
@@ -130,11 +131,14 @@ function berekenVermogensgroei() {
         const minimaalInkomenDitJaar = minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar);
         let herinvesterenBedrag = 0;
 
-        // Als het maandelijks inkomen hoger is dan het minimale inkomen
-        if (maandelijksInkomen > minimaalInkomenDitJaar) {
-            // Herinvesteer het verschil volgens het percentage
-            herinvesterenBedrag += (maandelijksInkomen - minimaalInkomenDitJaar) * 12 * inkomenHerinvesteringPercentage;
-        }
+      // Bereken hoeveel er beschikbaar is voor herinvestering
+const jaarlijksMinimaalInkomen = minimaalInkomenDitJaar * 12;
+let beschikbaarVoorHerinvestering = 0;
+
+if (gegenereerdInkomen > jaarlijksMinimaalInkomen) {
+    beschikbaarVoorHerinvestering = (gegenereerdInkomen - jaarlijksMinimaalInkomen) * inkomenHerinvesteringPercentage;
+    herinvesterenBedrag += beschikbaarVoorHerinvestering;
+}
 
         // Als waardestijging moet worden hergeïnvesteerd
         if (herinvesteerWaardestijging) {
@@ -143,7 +147,7 @@ function berekenVermogensgroei() {
 
         // Update portfolio
         huidigePortfolioWaarde *= (1 + waardestijging);
-        huidigEigenVermogen = huidigePortfolioWaarde * (1 - ltv) + herinvesterenBedrag;
+        huidigEigenVermogen = huidigePortfolioWaarde * (1 - ltv);
 
         // Check break-even punt
         if (!breakEvenJaar && gegenereerdInkomen >= startEigenVermogen) {
@@ -162,14 +166,14 @@ function berekenVermogensgroei() {
         }
 
      projectie.push({
-                    jaar,
+                    jaar: jaar,
                     vastgoedwaarde: huidigePortfolioWaarde,
                     nettoInkomen: Math.min(maandelijksInkomen, minimaalInkomenDitJaar) + 
                                 (maandelijksInkomen > minimaalInkomenDitJaar ? 
                                 (maandelijksInkomen - minimaalInkomenDitJaar) * (1 - inkomenHerinvesteringPercentage) : 0),
                     eigenVermogen: huidigEigenVermogen,
-                    eigenVermogenStijging: jaar > 0 ? huidigEigenVermogen - projectie[jaar-1].eigenVermogen : 0,
-                    aantalPanden: Math.ceil(huidigePortfolioWaarde / pandwaarde),
+                    eigenVermogenStijging: jaar === 0 ? huidigEigenVermogen - startEigenVermogen : huidigEigenVermogen - projectie[jaar-1].eigenVermogen,
+                    aantalPanden: Math.floor(huidigePortfolioWaarde / pandwaarde),
                     roe: (gegenereerdInkomen / huidigEigenVermogen) * 100
                 });
             }
@@ -219,7 +223,9 @@ function berekenVermogensgroei() {
 
             // Update grafieken
             updateVermogensgroeiGrafieken(projectie);
-        }
+}
+        
+
 
         function formatBedrag(bedrag) {
             return new Intl.NumberFormat('nl-NL', { 
@@ -241,7 +247,7 @@ function berekenVermogensgroei() {
                 const percentageVanMinimaal = (jaar.nettoInkomen / minimaalInkomenDitJaar) * 100;
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${jaar.jaar}</td>
+                    <td>${jaar.jaar +1}</td>
                     <td>${formatBedrag(jaar.vastgoedwaarde)}</td>
                     <td>${formatBedrag(jaar.nettoInkomen)} van ${formatBedrag(minimaalInkomenDitJaar)} (${percentageVanMinimaal.toFixed(1)}%)</td>
                     <td>${formatBedrag(jaar.eigenVermogen)}</td>
@@ -251,6 +257,8 @@ function berekenVermogensgroei() {
                 `;
                 tbody.appendChild(row);
             });
+
+            
         }
 
         function updateVermogensgroeiGrafieken(projectie) {

@@ -14,14 +14,14 @@
     <div class="container">
         <!-- Tab navigatie -->
         <div class="tab-navigation">
-            <button class="tab-button active" data-tab="scenario">Scenario Analyse</button>
-            <button class="tab-button" data-tab="groeiprojectie">Groeiprojectie</button>
-            <button class="tab-button" data-tab="vermogensdoel">Vermogensdoel</button>
-            <button class="tab-button" data-tab="vermogensgroei">Vermogensgroei & Inkomen</button>
+            <button class="tab-button active" data-tab="vermogensgroei">Vermogensgroei & Inkomen</button>
+            <button class="tab-button" data-tab="scenario">Scenario Analyse</button>
+            
+            
         </div>
 
         <!-- Scenario Tab content -->
-        <div id="scenarioTab" class="tab-content active">
+        <div id="scenarioTab" class="tab-content">
             <div class="main-layout">
                 <!-- Instellingen Panel -->
                 <div class="settings-panel">
@@ -54,14 +54,14 @@
                                             <option value="prive">Privé</option>
                                             <option value="holding">Holding</option>
                                         </select>
-                                    </div>
+                    </div>
 
-                                    <div class="form-group">
+                        <div class="form-group">
                                         <label for="vennootschapsbelasting">Vennootschapsbelasting (%):</label>
                                         <input type="number" id="vennootschapsbelasting" value="19.8" step="0.1" min="0">
-                                    </div>
+                        </div>
 
-                                    <div class="form-group">
+                        <div class="form-group">
                                         <label for="waardestijging">Waardestijging (% per jaar):</label>
                                         <input type="number" id="waardestijging" value="5" step="0.1" min="0">
                                     </div>
@@ -74,7 +74,7 @@
                             <h3>Holding Instellingen</h3>
                             <div class="grid">
                                 <div class="grid-col-1">
-                                    <div class="form-group">
+                        <div class="form-group">
                                         <label for="rentePrive">Rente prive (%):</label>
                                         <input type="number" id="rentePrive" value="5" step="0.1" min="0">
                                     </div>
@@ -132,474 +132,12 @@
             </div>
         </div>
 
-        <!-- Groeiprojectie Tab content -->
-        <div id="groeiprojectieTab" class="tab-content">
-            <div class="card">
-                <h2>Vastgoed Groeiprojectie</h2>
+     
 
-                <!-- Basis Instellingen -->
-                <div class="settings-section">
-                    <h3>Basis Instellingen</h3>
-                    <div class="grid">
-                        <div class="grid-col-2">
-                            <div class="form-group">
-                                <label for="eigenVermogen">Eigen vermogen (€):</label>
-                                <input type="number" id="eigenVermogen" value="500000" step="10000">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="ltv">Loan-to-Value (%):</label>
-                                <input type="number" id="ltv" value="75" min="0" max="100">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="gewenstNettoInkomen">Gewenst netto maandinkomen (€):</label>
-                                <input type="number" id="gewenstNettoInkomen" value="5000" step="100">
-                            </div>
-                    </div>
-
-                    <div class="grid-col-2">
-                        <div class="form-group">
-                            <label for="huurRendement">Bruto huurrendement (%):</label>
-                            <input type="number" id="huurRendement" value="6" step="0.1" min="0">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="kostenPercentage">Kosten (% van woningwaarde per jaar):</label>
-                            <input type="number" id="kostenPercentage" value="1.5" step="0.1" min="0">
-                        </div>
-
-                        <div class="form-group">
-                            <label for="waardestijgingPercentage">Waardestijging (% per jaar):</label>
-                            <input type="number" id="waardestijgingPercentage" value="5" step="0.1" min="0">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Geavanceerde Instellingen -->
-                <div class="settings-section">
-                    <h3>Geavanceerde Instellingen</h3>
-                <div class="grid">
-                    <div class="grid-col-2">
-                        <div class="form-group">
-                                <label for="rentePercentage">Hypotheekrente (%):</label>
-                                <input type="number" id="rentePercentage" value="5" step="0.1" min="0">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="belastingPercentage">Belasting percentage (%):</label>
-                                <input type="number" id="belastingPercentage" value="30" step="1" min="0" max="100">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="inflatiePercentage">Inflatie (% per jaar):</label>
-                                <input type="number" id="inflatiePercentage" value="2" step="0.1" min="0">
-                        </div>
-                    </div>
-
-                    <div class="grid-col-2">
-                            <div class="form-group">
-                                <label for="herinvesteringsPercentage">Herinvesteringspercentage (%):</label>
-                                <input type="number" id="herinvesteringsPercentage" value="100" step="10" min="0" max="100">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="maxLtvPercentage">Maximale LTV voor nieuwe investeringen (%):</label>
-                                <input type="number" id="maxLtvPercentage" value="75" step="5" min="0" max="100">
-                            </div>
-
-                            <div class="form-group">
-                                <label for="minCashflowReserve">Minimale cashflow reserve (maanden):</label>
-                                <input type="number" id="minCashflowReserve" value="6" step="1" min="0">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="checkbox-group">
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="herinvesteerWaardestijging" checked>
-                                <label for="herinvesteerWaardestijging">Herinvesteer waardestijging</label>
-                            </div>
-
-                            <div class="checkbox-container">
-                                <input type="checkbox" id="herinvesteerCashflow">
-                                <label for="herinvesteerCashflow">Herinvesteer cashflow</label>
-                            </div>
-
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="rekeningMetInflatie" checked>
-                            <label for="rekeningMetInflatie">Rekening houden met inflatie</label>
-                        </div>
-
-                        <div class="checkbox-container">
-                            <input type="checkbox" id="rekeningMetBelasting" checked>
-                            <label for="rekeningMetBelasting">Rekening houden met belasting</label>
-                        </div>
-                    </div>
-                </div>
-
-                <button id="berekenGroei" class="button" style="margin-top: 20px;">Bereken groeiprojectie</button>
-            </div>
-
-            <!-- Groeiprojectie Resultaten -->
-            <div id="groeiResultaten" class="card" style="display: none;">
-                <h2>Groeiprojectie Resultaten</h2>
-
-                <div class="resultaat-blok">
-                    <div class="grid">
-                        <div class="grid-col-3">
-                            <div class="resultaat-rij">
-                                <span class="resultaat-label">Startinvestering:</span>
-                                <span id="totaleInvestering">€ 2,000,000</span>
-                            </div>
-                        </div>
-
-                        <div class="grid-col-3">
-                            <div class="resultaat-rij">
-                                <span class="resultaat-label">Start eigen vermogen:</span>
-                                <span id="eigenVermogenStart">€ 500,000</span>
-                            </div>
-                        </div>
-
-                        <div class="grid-col-3">
-                            <div class="resultaat-rij">
-                                <span class="resultaat-label">Jaarlijkse cashflow (start):</span>
-                                <span id="jaarlijkseCashflowStart">€ 15,000</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid">
-                        <div class="grid-col-3">
-                            <div class="resultaat-rij">
-                                <span class="resultaat-label">Jaren tot doel:</span>
-                                <span id="jarenTotDoel">12 jaren</span>
-                            </div>
-                        </div>
-
-                        <div class="grid-col-3">
-                            <div class="resultaat-rij">
-                                <span class="resultaat-label">Investering bij doel:</span>
-                                <span id="investeringBijDoel">€ 6,230,450</span>
-                            </div>
-                        </div>
-
-                        <div class="grid-col-3">
-                            <div class="resultaat-rij">
-                                <span class="resultaat-label">EV bij doel:</span>
-                                <span id="evBijDoel">€ 1,557,613</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Grafiek container -->
-                <div class="chart-container" id="groeigrafiek">
-                    <!-- Hier komt de grafiek -->
-                </div>
-
-                <div class="legenda">
-                    <div class="legenda-item">
-                        <div class="legenda-kleur" style="background-color: #3182ce;"></div>
-                        <span>Totale investering</span>
-                    </div>
-                    <div class="legenda-item">
-                        <div class="legenda-kleur" style="background-color: #48bb78;"></div>
-                        <span>Eigen vermogen</span>
-                    </div>
-                    <div class="legenda-item">
-                        <div class="legenda-kleur" style="background-color: #f6ad55;"></div>
-                        <span>Jaarlijkse cashflow</span>
-                    </div>
-                </div>
-
-                <!-- Tabel met gedetailleerde resultaten -->
-                <div class="table-container">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Jaar</th>
-                                <th>Totale investering</th>
-                                <th>Eigen vermogen</th>
-                                <th>Schuld</th>
-                                <th>Jaarlijkse cashflow</th>
-                                <th>Waardestijging</th>
-                                <th>Herinvestering</th>
-                                <th>LTV ratio (%)</th>
-                                <th>ROE (%)</th>
-                                <th>Doelbereikt</th>
-                            </tr>
-                        </thead>
-                        <tbody id="groeiTabel">
-                            <!-- Hier komen de rijen -->
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Formules en berekeningen -->
-            <div class="card">
-                <h2>Formules en Berekeningen</h2>
-
-                <div class="formules-sectie">
-                    <div class="formule-item">
-                        <div class="formule-naam">Totale investering</div>
-                        <div class="formule-beschrijving">De totale vastgoedinvestering berekend op basis van eigen
-                            vermogen en LTV</div>
-                        <div class="formule-code">totaleInvestering = eigenVermogen / (1 - ltv / 100)</div>
-                        <div>Voorbeeld: € 500.000 / (1 - 75% / 100) = € 2.000.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Hypotheek</div>
-                        <div class="formule-beschrijving">Het geleende bedrag</div>
-                        <div class="formule-code">hypotheek = totaleInvestering - eigenVermogen</div>
-                        <div>Voorbeeld: € 2.000.000 - € 500.000 = € 1.500.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Jaarlijkse huurinkomsten</div>
-                        <div class="formule-beschrijving">De totale huuropbrengst per jaar</div>
-                        <div class="formule-code">jaarlijkseHuurInkomsten = totaleInvestering * (huurRendement / 100)
-                        </div>
-                        <div>Voorbeeld: € 2.000.000 * (6% / 100) = € 120.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Jaarlijkse rentekosten</div>
-                        <div class="formule-beschrijving">De jaarlijkse kosten voor de hypotheek (alleen rente)</div>
-                        <div class="formule-code">jaarlijkseRente = hypotheek * (rentePercentage / 100)</div>
-                        <div>Voorbeeld: € 1.500.000 * (5% / 100) = € 75.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Jaarlijkse onderhoudskosten</div>
-                        <div class="formule-beschrijving">De jaarlijkse kosten voor onderhoud, belastingen, etc.</div>
-                        <div class="formule-code">jaarlijkseKosten = totaleInvestering * (kostenPercentage / 100)</div>
-                        <div>Voorbeeld: € 2.000.000 * (1.5% / 100) = € 30.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Jaarlijkse cashflow</div>
-                        <div class="formule-beschrijving">De netto-inkomsten per jaar</div>
-                        <div class="formule-code">jaarlijkseCashflow = jaarlijkseHuurInkomsten - jaarlijkseRente -
-                            jaarlijkseKosten</div>
-                        <div>Voorbeeld: € 120.000 - € 75.000 - € 30.000 = € 15.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Jaarlijkse waardestijging</div>
-                        <div class="formule-beschrijving">De verwachte waardevermeerdering van het vastgoed per jaar
-                        </div>
-                        <div class="formule-code">jaarlijkseWaardestijging = totaleInvestering *
-                            (waardestijgingPercentage / 100)</div>
-                        <div>Voorbeeld: € 2.000.000 * (5% / 100) = € 100.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Herinvestering</div>
-                        <div class="formule-beschrijving">Het bedrag dat wordt hergebruikt voor nieuwe investeringen
-                        </div>
-                        <div class="formule-code">herinvesterenBedrag = (herinvesteerWaardestijging ? waardestijging :
-                            0) + (herinvesteerCashflow ? cashflow : 0)</div>
-                        <div>Voorbeeld: (true ? € 100.000 : 0) + (false ? € 15.000 : 0) = € 100.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Nieuwe hypotheek</div>
-                        <div class="formule-beschrijving">De extra hypotheek die kan worden aangetrokken bij
-                            herinvestering</div>
-                        <div class="formule-code">nieuweHypotheek = herinvesterenBedrag * (ltv / (100 - ltv))</div>
-                        <div>Voorbeeld: € 100.000 * (75 / (100 - 75)) = € 300.000</div>
-                    </div>
-
-                    <div class="formule-item">
-                        <div class="formule-naam">Rendement op eigen vermogen (ROE)</div>
-                        <div class="formule-beschrijving">Het netto rendement als percentage van het eigen vermogen
-                        </div>
-                        <div class="formule-code">roe = (cashflow / eigenVermogen) * 100</div>
-                        <div>Voorbeeld: (€ 15.000 / € 500.000) * 100 = 3%</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vermogensdoel Tab content -->
-        <div id="vermogensdoelTab" class="tab-content">
-            <div class="main-layout">
-                <!-- Instellingen Panel -->
-                <div class="settings-panel">
-                    <div class="card">
-                        <h2>Instellingen</h2>
-
-                        <!-- Basis Instellingen -->
-                        <div class="settings-section">
-                            <h3>Basis Instellingen</h3>
-                            <div class="grid">
-                                <div class="grid-col-1">
-                                    <div class="form-group">
-                                        <label for="gewenstInkomen">Gewenst netto maandinkomen (€):</label>
-                                        <input type="number" id="gewenstInkomen" value="5000" step="100">
-    </div>
-
-                                    <div class="form-group">
-                                        <label for="inkomenStijging">Jaarlijkse stijging gewenst inkomen (%):</label>
-                                        <input type="number" id="inkomenStijging" value="3" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="looptijd">Looptijd berekening (jaren):</label>
-                                        <input type="number" id="looptijd" value="30" step="1" min="1">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="structuurVermogensdoel">Structuur:</label>
-                                        <select id="structuurVermogensdoel" class="form-control">
-                                            <option value="prive">Privé</option>
-                                            <option value="holding">Holding</option>
-                                        </select>
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="ltvVermogensdoel">Loan-to-Value (%):</label>
-                                        <input type="number" id="ltvVermogensdoel" value="75" min="0" max="100">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="rentePercentageVermogensdoel">Hypotheekrente (%):</label>
-                                        <input type="number" id="rentePercentageVermogensdoel" value="5" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="huurrendementVermogensdoel">Huurrendement (%):</label>
-                                        <input type="number" id="huurrendementVermogensdoel" value="6" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="huurstijging">Jaarlijkse huurstijging (%):</label>
-                                        <input type="number" id="huurstijging" value="2" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="kostenPercentageVermogensdoel">Kosten percentage (%):</label>
-                                        <input type="number" id="kostenPercentageVermogensdoel" value="1.5" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="waardestijgingVermogensdoel">Waardestijging vastgoed (%):</label>
-                                        <input type="number" id="waardestijgingVermogensdoel" value="5" step="0.1" min="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Herinvesteringsopties -->
-                        <div class="settings-section">
-                            <h3>Herinvesteringsopties</h3>
-                            <div class="checkbox-group">
-                                <div class="checkbox-container">
-                                    <input type="checkbox" id="herinvesteerCashflowVermogensdoel" checked>
-                                    <label for="herinvesteerCashflowVermogensdoel">Herinvesteer cashflow</label>
-                                </div>
-
-                                <div class="checkbox-container">
-                                    <input type="checkbox" id="herinvesteerWaardestijgingVermogensdoel" checked>
-                                    <label for="herinvesteerWaardestijgingVermogensdoel">Herinvesteer waardestijging</label>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Holding Instellingen -->
-                        <div id="holdingInstellingenVermogensdoel" class="settings-section" style="display: none;">
-                            <h3>Holding Instellingen</h3>
-                            <div class="grid">
-                                <div class="grid-col-1">
-                                    <div class="form-group">
-                                        <label for="rentePriveVermogensdoel">Rente prive (%):</label>
-                                        <input type="number" id="rentePriveVermogensdoel" value="5" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="vennootschapsbelastingVermogensdoel">Vennootschapsbelasting (%):</label>
-                                        <input type="number" id="vennootschapsbelastingVermogensdoel" value="19.8" step="0.1" min="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Resultaten Panel -->
-                <div class="results-panel">
-                    <!-- Vermogensdoel Resultaten -->
-                    <div id="vermogensdoelResultaten" class="card">
-                        <h2>Vermogensdoel Resultaten</h2>
-                        
-                        <!-- Samenvatting -->
-                        <div class="resultaat-blok">
-                            <div class="grid">
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
-                                        <span class="resultaat-label">Benodigd eigen vermogen:</span>
-                                        <span id="benodigdEigenVermogen">€ 0</span>
-                                    </div>
-                                </div>
-
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
-                                        <span class="resultaat-label">Totale vastgoedwaarde:</span>
-                                        <span id="totaleVastgoedwaarde">€ 0</span>
-                                    </div>
-                                </div>
-
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
-                                        <span class="resultaat-label">Aantal woningen:</span>
-                                        <span id="aantalWoningen">0</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Diagrammen -->
-                        <div class="charts-grid">
-                            <!-- Inkomensprojectie Chart -->
-                            <div class="chart-container">
-                                <canvas id="inkomensprojectieChart"></canvas>
-                            </div>
-
-                            <!-- Portfolio Groei Chart -->
-                            <div class="chart-container">
-                                <canvas id="portfolioGroeiChart"></canvas>
-                            </div>
-                        </div>
-
-                        <!-- Gedetailleerde Projectie -->
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Jaar</th>
-                                        <th>Gewenst inkomen</th>
-                                        <th>Gegenereerd inkomen</th>
-                                        <th>Portfolio waarde</th>
-                                        <th>Eigen vermogen</th>
-                                        <th>Extra EV nodig</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="vermogensdoelTabel">
-                                    <!-- Hier komen de projectie rijen -->
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+  
 
         <!-- Vermogensgroei & Inkomen Tab content -->
-        <div id="vermogensgroeiTab" class="tab-content">
+        <div id="vermogensgroeiTab" class="tab-content active">
             <div class="main-layout">
                 <!-- Instellingen Panel -->
                 <div class="settings-panel">
@@ -686,15 +224,18 @@
                                         <label for="inkomenHerinvestering">Herinvestering cashflow (%):</label>
                                         <input type="range" id="inkomenHerinvestering" class="slider" min="0" max="100" value="50">
                                         <span id="inkomenHerinvesteringValue">50%</span>
-                                    </div>
+                            </div>
 
-                                    <div class="checkbox-container">
+                            <div class="checkbox-container">
                                         <input type="checkbox" id="herinvesteerWaardestijgingVermogensgroei" checked>
                                         <label for="herinvesteerWaardestijgingVermogensgroei">Herinvesteer waardestijging</label>
                                     </div>
                                 </div>
                             </div>
                         </div>
+
+                        
+                        
 
                         <!-- Comfortniveaus -->
                         <div class="settings-section">
@@ -720,22 +261,7 @@
                         </div>
 
                         <!-- Holding Instellingen -->
-                        <div id="holdingInstellingenVermogensgroei" class="settings-section" style="display: none;">
-                            <h3>Holding Instellingen</h3>
-                            <div class="grid">
-                                <div class="grid-col-1">
-                                    <div class="form-group">
-                                        <label for="rentePriveVermogensgroei">Rente prive (%):</label>
-                                        <input type="number" id="rentePriveVermogensgroei" value="5" step="0.1" min="0">
-                                    </div>
-
-                                    <div class="form-group">
-                                        <label for="vennootschapsbelastingVermogensgroei">Vennootschapsbelasting (%):</label>
-                                        <input type="number" id="vennootschapsbelastingVermogensgroei" value="19.8" step="0.1" min="0">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                       
                     </div>
                 </div>
 
@@ -746,48 +272,48 @@
                         <h2>Vermogensgroei & Inkomen Resultaten</h2>
                         
                         <!-- Samenvatting -->
-                        <div class="resultaat-blok">
-                            <div class="grid">
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
+                <div class="resultaat-blok">
+                    <div class="grid">
+                        <div class="grid-col-3">
+                            <div class="resultaat-rij">
                                         <span class="resultaat-label">Totale vastgoedwaarde:</span>
                                         <span id="totaleVastgoedwaardeVermogensgroei">€ 0</span>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
 
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
+                        <div class="grid-col-3">
+                            <div class="resultaat-rij">
                                         <span class="resultaat-label">Aantal woningen:</span>
                                         <span id="aantalWoningenVermogensgroei">0</span>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
 
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
+                        <div class="grid-col-3">
+                            <div class="resultaat-rij">
                                         <span class="resultaat-label">Initieel netto inkomen:</span>
                                         <span id="initieelNettoInkomen">€ 0</span>
-                                    </div>
-                                </div>
                             </div>
+                        </div>
+                    </div>
 
-                            <div class="grid">
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
+                    <div class="grid">
+                        <div class="grid-col-3">
+                            <div class="resultaat-rij">
                                         <span class="resultaat-label">Break-even punt:</span>
                                         <span id="breakEvenPunt">-</span>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
 
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
-                                        <span class="resultaat-label">Rendement per €100k EV:</span>
+                        <div class="grid-col-3">
+                            <div class="resultaat-rij">
+                                        <span class="resultaat-label">Rendement jaar 1 per €100k:</span>
                                         <span id="rendementPer100k">€ 0 (0%)</span>
-                                    </div>
-                                </div>
+                            </div>
+                        </div>
 
-                                <div class="grid-col-3">
-                                    <div class="resultaat-rij">
-                                        <span class="resultaat-label">Totale portfolio waarde:</span>
+                        <div class="grid-col-3">
+                            <div class="resultaat-rij">
+                                        <span class="resultaat-label">Eigen vermogen einde looptijd:</span>
                                         <span id="totalePortfolioWaarde">€ 0</span>
                                     </div>
                                 </div>
@@ -809,41 +335,41 @@
                                 <div class="comfort-item">
                                     <span class="comfort-label">Comfortniveau 3</span>
                                     <span id="comfortNiveau3Jaar">-</span>
-                                </div>
-                            </div>
                         </div>
+                    </div>
+                </div>
 
                         <!-- Diagrammen -->
                         <div class="charts-grid">
                             <!-- Vermogensgroei Chart -->
                             <div class="chart-container">
                                 <canvas id="vermogensgroeiChart"></canvas>
-                            </div>
+                </div>
 
                             <!-- Inkomen Chart -->
                             <div class="chart-container">
                                 <canvas id="inkomenChart"></canvas>
-                            </div>
-                        </div>
+                    </div>
+                </div>
 
                         <!-- Gedetailleerde Projectie -->
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Jaar</th>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Jaar</th>
                                         <th>Vastgoedwaarde</th>
                                         <th>Netto inkomen p/m</th>
-                                        <th>Eigen vermogen</th>
+                                <th>Eigen vermogen</th>
                                         <th>EV stijging</th>
                                         <th>Aantal panden</th>
                                         <th>ROE %</th>
-                                    </tr>
-                                </thead>
+                            </tr>
+                        </thead>
                                 <tbody id="vermogensgroeiTabel">
                                     <!-- Hier komen de projectie rijen -->
-                                </tbody>
-                            </table>
+                        </tbody>
+                    </table>
                         </div>
                     </div>
                 </div>
