@@ -20,13 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
             const huurstijgingVermogensgroeiInput = document.getElementById('huurstijgingVermogensgroei');
             const kostenPercentageVermogensgroeiInput = document.getElementById('kostenPercentageVermogensgroei');
             const waardestijgingVermogensgroeiInput = document.getElementById('waardestijgingVermogensgroei');
-            const inkomenHerinvesteringInput = document.getElementById('inkomenHerinvestering');
-            const inkomenHerinvesteringValue = document.getElementById('inkomenHerinvesteringValue');
             const herinvesteerWaardestijgingVermogensgroeiInput = document.getElementById('herinvesteerWaardestijgingVermogensgroei');
             const comfortNiveau1Input = document.getElementById('comfortNiveau1');
             const comfortNiveau2Input = document.getElementById('comfortNiveau2');
             const comfortNiveau3Input = document.getElementById('comfortNiveau3');
-           const minimaalInkomenInput = document.getElementById('minimaalInkomen');
+            const minimaalInkomenInput = document.getElementById('minimaalInkomen');
             const minimaalInkomenInflatieInput = document.getElementById('minimaalInkomenInflatie');
 
             // Functie om vermogensgroei waardes op te slaan
@@ -42,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     huurstijging: huurstijgingVermogensgroeiInput.value,
                     kostenPercentage: kostenPercentageVermogensgroeiInput.value,
                     waardestijging: waardestijgingVermogensgroeiInput.value,
-                    inkomenHerinvestering: inkomenHerinvesteringInput.value,
                     herinvesteerWaardestijging: herinvesteerWaardestijgingVermogensgroeiInput.checked,
                     comfortNiveau1: comfortNiveau1Input.value,
                     comfortNiveau2: comfortNiveau2Input.value,
@@ -87,10 +84,6 @@ document.addEventListener('DOMContentLoaded', function () {
             if (vermogensgroeiWaarden.huurstijging) huurstijgingVermogensgroeiInput.value = vermogensgroeiWaarden.huurstijging;
             if (vermogensgroeiWaarden.kostenPercentage) kostenPercentageVermogensgroeiInput.value = vermogensgroeiWaarden.kostenPercentage;
             if (vermogensgroeiWaarden.waardestijging) waardestijgingVermogensgroeiInput.value = vermogensgroeiWaarden.waardestijging;
-            if (vermogensgroeiWaarden.inkomenHerinvestering) {
-                inkomenHerinvesteringInput.value = vermogensgroeiWaarden.inkomenHerinvestering;
-                inkomenHerinvesteringValue.textContent = `${vermogensgroeiWaarden.inkomenHerinvestering}%`;
-            }
             if (vermogensgroeiWaarden.herinvesteerWaardestijging !== undefined) {
                 herinvesteerWaardestijgingVermogensgroeiInput.checked = vermogensgroeiWaarden.herinvesteerWaardestijging;
             }
@@ -121,13 +114,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     berekenVermogensgroei();
                     saveVermogensgroeiWaarden();
                 });
-            });
-
-            // Update slider waarde display
-            inkomenHerinvesteringInput.addEventListener('input', () => {
-                inkomenHerinvesteringValue.textContent = `${inkomenHerinvesteringInput.value}%`;
-                berekenVermogensgroei();
-                saveVermogensgroeiWaarden();
             });
 
             // Structuur wijziging handlers
