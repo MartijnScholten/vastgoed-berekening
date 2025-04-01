@@ -102,26 +102,32 @@ function berekenVermogensgroei() {
     const projectie = [];
     let huidigePortfolioWaarde = totaleVastgoedwaarde;
     let huidigEigenVermogen = startEigenVermogen;
+    let huidigePandwaarde = pandwaarde;
     let breakEvenJaar = null;
     let comfortNiveau1Jaar = null;
     let comfortNiveau2Jaar = null;
     let comfortNiveau3Jaar = null;
+    let spaarpotVoorHerinvestering = 0;
+    let aantalPanden = Math.floor(totaleVastgoedwaarde / pandwaarde);
 
     for (let jaar = 0; jaar <= looptijd; jaar++) {
+        // Update pandwaarde met waardestijging
+        huidigePandwaarde *= (1 + waardestijging);
+
         // Bereken inkomen voor dit jaar
         let gegenereerdInkomen;
         if (isHolding) {
             const rentePrive = parseFloat(document.getElementById('rentePriveVermogensgroei').value) / 100;
             const vennootschapsbelasting = parseFloat(document.getElementById('vennootschapsbelastingVermogensgroei').value) / 100;
-            const huurInkomsten = huidigePortfolioWaarde * huurrendement * Math.pow(1 + huurstijging, jaar);
+            const huurInkomsten = huidigePortfolioWaarde * huurrendement;
             const hypotheekRente = hypotheek * rentePercentage;
-            const onderhoudskosten = huidigePortfolioWaarde * kostenPercentage * Math.pow(1 + huurstijging, jaar);
+            const onderhoudskosten = huidigePortfolioWaarde * kostenPercentage;
             const vennootschapsbelastingBedrag = rentePrive * vennootschapsbelasting;
             gegenereerdInkomen = huurInkomsten - hypotheekRente - onderhoudskosten - vennootschapsbelastingBedrag;
         } else {
-            const huurInkomsten = huidigePortfolioWaarde * huurrendement * Math.pow(1 + huurstijging, jaar);
+            const huurInkomsten = huidigePortfolioWaarde * huurrendement;
             const hypotheekRente = hypotheek * rentePercentage;
-            const onderhoudskosten = huidigePortfolioWaarde * kostenPercentage * Math.pow(1 + huurstijging, jaar);
+            const onderhoudskosten = huidigePortfolioWaarde * kostenPercentage;
             gegenereerdInkomen = huurInkomsten - hypotheekRente - onderhoudskosten;
         }
 
@@ -134,56 +140,62 @@ function berekenVermogensgroei() {
         const jaarlijksMinimaalInkomen = minimaalInkomenDitJaar * 12;
         let beschikbaarVoorHerinvestering = 0;
 
-        // Als er meer inkomen is dan het minimale inkomen, wordt het overschot hergeïnvesteerd
+        // Als er meer inkomen is dan het minimale inkomen, wordt het overschot gespaard
         if (gegenereerdInkomen > jaarlijksMinimaalInkomen) {
             beschikbaarVoorHerinvestering = gegenereerdInkomen - jaarlijksMinimaalInkomen;
-            herinvesterenBedrag += beschikbaarVoorHerinvestering;
+            spaarpotVoorHerinvestering += beschikbaarVoorHerinvestering;
         }
 
-        // Als waardestijging moet worden hergeïnvesteerd
-        if (herinvesteerWaardestijging) {
-            herinvesterenBedrag += huidigePortfolioWaarde * waardestijging;
+        // Elke 3 jaar herinvesteren (vanaf jaar 3)
+        if (jaar > 0 && jaar % 3 === 0) {
+            if (jaar === 3) {
+                console.log('Herinvestering jaar 3:');
+                console.log('Spaarpot beschikbaar:', spaarpotVoorHerinvestering);
+            }
+
+            // Het gespaarde bedrag wordt gebruikt als eigen vermogen voor nieuwe investering
+            const nieuwInvesteringsBedrag = spaarpotVoorHerinvestering / (1 - ltv);
+            herinvesterenBedrag = nieuwInvesteringsBedrag;
+            const nieuweAantalPanden = Math.floor(nieuwInvesteringsBedrag / huidigePandwaarde);
+            
+            if (jaar === 3) {
+                console.log('Nieuw investeringsbedrag:', nieuwInvesteringsBedrag);
+                console.log('Nieuwe aantal panden:', nieuweAantalPanden);
+                console.log('Huidige pandwaarde:', huidigePandwaarde);
+            }
+
+            aantalPanden += nieuweAantalPanden;
+            spaarpotVoorHerinvestering = 0; // Reset spaarpot na herinvestering
         }
 
-        // Update portfolio met herinvestering
+        // Update portfolio met herinvestering en waardestijging
         const oudePortfolioWaarde = huidigePortfolioWaarde;
-        huidigePortfolioWaarde = huidigePortfolioWaarde + herinvesterenBedrag;
-        if (!herinvesteerWaardestijging) {
-            huidigePortfolioWaarde *= (1 + waardestijging);
+        
+        // Voeg eerst nieuwe investering toe (als die er is)
+        huidigePortfolioWaarde += herinvesterenBedrag;
+        
+        // Dan pas waardestijging toepassen
+        const waardeVoorStijging = huidigePortfolioWaarde;
+        huidigePortfolioWaarde *= (1 + waardestijging);
+        const waardeStijgingBedrag = huidigePortfolioWaarde - waardeVoorStijging;
+
+        // Als waardestijging moet worden hergeïnvesteerd, voeg de volledige waardestijging toe aan spaarpot
+        if (herinvesteerWaardestijging) {
+            spaarpotVoorHerinvestering += waardeStijgingBedrag;
         }
+        
         const oudeEigenVermogen = huidigEigenVermogen;
         huidigEigenVermogen = huidigePortfolioWaarde * (1 - ltv);
 
-        if (jaar === 0) {
-            console.log('Berekeningen jaar 1:');
-            console.log('Start eigen vermogen:', startEigenVermogen);
-            console.log('Start portfolio waarde:', totaleVastgoedwaarde);
-            console.log('Hypotheek:', hypotheek);
-            console.log('Gegenereerd inkomen:', gegenereerdInkomen);
-            console.log('Minimaal inkomen dit jaar:', jaarlijksMinimaalInkomen);
-            console.log('Beschikbaar voor herinvestering:', beschikbaarVoorHerinvestering);
-            console.log('Herinvesteren bedrag:', herinvesterenBedrag);
+        if (jaar === 3) {
+            console.log('Portfolio update jaar 3:');
             console.log('Oude portfolio waarde:', oudePortfolioWaarde);
+            console.log('Na herinvestering:', waardeVoorStijging);
+            console.log('Waardestijging bedrag:', waardeStijgingBedrag);
             console.log('Nieuwe portfolio waarde:', huidigePortfolioWaarde);
-            console.log('Oude eigen vermogen:', oudeEigenVermogen);
-            console.log('Nieuwe eigen vermogen:', huidigEigenVermogen);
-            console.log('Eigen vermogen stijging:', huidigEigenVermogen - startEigenVermogen);
-        }
-
-        // Check break-even punt
-        if (!breakEvenJaar && gegenereerdInkomen >= startEigenVermogen) {
-            breakEvenJaar = jaar;
-        }
-
-        // Check comfortniveaus
-        if (!comfortNiveau1Jaar && maandelijksInkomen >= 5000) {
-            comfortNiveau1Jaar = jaar;
-        }
-        if (!comfortNiveau2Jaar && maandelijksInkomen >= 10000) {
-            comfortNiveau2Jaar = jaar;
-        }
-        if (!comfortNiveau3Jaar && maandelijksInkomen >= 20000) {
-            comfortNiveau3Jaar = jaar;
+            if (herinvesteerWaardestijging) {
+                console.log('Waardestijging naar spaarpot:', waardeStijgingBedrag);
+            }
         }
 
         projectie.push({
@@ -192,12 +204,48 @@ function berekenVermogensgroei() {
             nettoInkomen: Math.min(maandelijksInkomen, minimaalInkomenDitJaar),
             eigenVermogen: huidigEigenVermogen,
             eigenVermogenStijging: jaar === 0 ? huidigEigenVermogen - startEigenVermogen : huidigEigenVermogen - projectie[jaar-1].eigenVermogen,
-            aantalPanden: Math.floor(huidigePortfolioWaarde / pandwaarde),
+            aantalPanden: aantalPanden,
+            beschikbaarVoorHerinvestering: spaarpotVoorHerinvestering,
             roe: jaar === 0 ? (gegenereerdInkomen / startEigenVermogen) * 100 : (gegenereerdInkomen / projectie[jaar-1].eigenVermogen) * 100,
             totaalRendement: jaar === 0 ? 
                 ((gegenereerdInkomen + (huidigePortfolioWaarde * waardestijging)) / startEigenVermogen) * 100 :
                 ((gegenereerdInkomen + (huidigePortfolioWaarde * waardestijging)) / projectie[jaar-1].eigenVermogen) * 100
         });
+
+        // Check break-even punt
+        if (!breakEvenJaar && gegenereerdInkomen >= startEigenVermogen) {
+            breakEvenJaar = jaar;
+        }
+
+        // Check comfortniveaus
+        const comfortNiveau1Bedrag = parseFloat(document.getElementById('comfortNiveau1').value);
+        const comfortNiveau2Bedrag = parseFloat(document.getElementById('comfortNiveau2').value);
+        const comfortNiveau3Bedrag = parseFloat(document.getElementById('comfortNiveau3').value);
+
+        if (!comfortNiveau1Jaar && maandelijksInkomen >= comfortNiveau1Bedrag) {
+            comfortNiveau1Jaar = jaar;
+            if (jaar === 4) {
+                console.log('Comfort niveau 1 bereikt in jaar 4:');
+                console.log('Maandelijks inkomen:', maandelijksInkomen);
+                console.log('Comfort niveau 1 bedrag:', comfortNiveau1Bedrag);
+            }
+        }
+        if (!comfortNiveau2Jaar && maandelijksInkomen >= comfortNiveau2Bedrag) {
+            comfortNiveau2Jaar = jaar;
+            if (jaar === 4) {
+                console.log('Comfort niveau 2 bereikt in jaar 4:');
+                console.log('Maandelijks inkomen:', maandelijksInkomen);
+                console.log('Comfort niveau 2 bedrag:', comfortNiveau2Bedrag);
+            }
+        }
+        if (!comfortNiveau3Jaar && maandelijksInkomen >= comfortNiveau3Bedrag) {
+            comfortNiveau3Jaar = jaar;
+            if (jaar === 7) {
+                console.log('Comfort niveau 3 bereikt in jaar 7:');
+                console.log('Maandelijks inkomen:', maandelijksInkomen);
+                console.log('Comfort niveau 3 bedrag:', comfortNiveau3Bedrag);
+            }
+        }
     }
 
     // Update UI
@@ -257,8 +305,31 @@ function formatBedrag(bedrag) {
 }
 
 function updateVermogensgroeiTabel(projectie) {
-    const tbody = document.getElementById('vermogensgroeiTabel');
+    const table = document.getElementById('vermogensgroeiTabel');
+    const thead = table.querySelector('thead') || document.createElement('thead');
+    const tbody = table.querySelector('tbody') || document.createElement('tbody');
+
+    // Update thead
+    thead.innerHTML = `
+        <tr>
+            <th>Jaar</th>
+            <th>Vastgoedwaarde</th>
+            <th>Netto inkomen</th>
+            <th>Eigen vermogen</th>
+            <th>EV stijging</th>
+            <th>Spaarpot</th>
+            <th>Aantal panden</th>
+            <th>ROE (Totaal)</th>
+        </tr>
+    `;
+
+    // Update tbody
     tbody.innerHTML = '';
+
+    // Zorg ervoor dat thead en tbody in de tabel zitten
+    if (!table.contains(thead)) table.appendChild(thead);
+    if (!table.contains(tbody)) table.appendChild(tbody);
+
     const minimaalInkomen = parseFloat(document.getElementById('minimaalInkomen').value);
     const minimaalInkomenInflatie = parseFloat(document.getElementById('minimaalInkomenInflatie').value) / 100;
 
@@ -272,6 +343,7 @@ function updateVermogensgroeiTabel(projectie) {
             <td>${formatBedrag(jaar.nettoInkomen)} van ${formatBedrag(minimaalInkomenDitJaar)} (${percentageVanMinimaal.toFixed(1)}%)</td>
             <td>${formatBedrag(jaar.eigenVermogen)}</td>
             <td>${formatBedrag(jaar.eigenVermogenStijging)}</td>
+            <td>${formatBedrag(jaar.beschikbaarVoorHerinvestering)}</td>
             <td>${jaar.aantalPanden}</td>
             <td>${jaar.roe.toFixed(1)}% (${jaar.totaalRendement.toFixed(1)}%)</td>
         `;
