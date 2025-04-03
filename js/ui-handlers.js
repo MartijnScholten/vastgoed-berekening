@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function () {
             const comfortNiveau3Input = document.getElementById('comfortNiveau3');
             const minimaalInkomenInput = document.getElementById('minimaalInkomen');
             const minimaalInkomenInflatieInput = document.getElementById('minimaalInkomenInflatie');
+            const aankoopFrequentieInput = document.getElementById('aankoopFrequentie');
 
             // Functie om vermogensgroei waardes op te slaan
             function saveVermogensgroeiWaarden() {
@@ -46,6 +47,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     comfortNiveau3: comfortNiveau3Input.value,
                     minimaalInkomen: minimaalInkomenInput.value,
                     minimaalInkomenInflatie: minimaalInkomenInflatieInput.value,
+                    aankoopFrequentie: aankoopFrequentieInput.value,
                 };
                 localStorage.setItem('vermogensgroeiWaarden', JSON.stringify(waarden));
             }
@@ -93,6 +95,21 @@ document.addEventListener('DOMContentLoaded', function () {
             
             if (vermogensgroeiWaarden.minimaalInkomen) minimaalInkomenInput.value = vermogensgroeiWaarden.minimaalInkomen;
             if (vermogensgroeiWaarden.minimaalInkomenInflatie) minimaalInkomenInflatieInput.value = vermogensgroeiWaarden.minimaalInkomenInflatie;
+            if (vermogensgroeiWaarden.aankoopFrequentie) aankoopFrequentieInput.value = vermogensgroeiWaarden.aankoopFrequentie;
+
+            // Functie om hefboomfactor te berekenen
+            function updateHefboomFactor() {
+                const ltvValue = parseFloat(ltvVermogensgroeiInput.value || 0) / 100;
+                const hefboomFactor = (1 / (1 - ltvValue)).toFixed(1);
+                const hefboomSpan = document.getElementById('hefboomFactor');
+                if (hefboomSpan) {
+                    hefboomSpan.textContent = `(x${hefboomFactor} hefboom)`;
+                }
+            }
+            
+            // Update hefboomfactor bij laden en bij wijziging
+            updateHefboomFactor();
+            ltvVermogensgroeiInput.addEventListener('input', updateHefboomFactor);
 
             // Event listeners voor scenario inputs
             [eigenVermogenInput, ltvInput, rentePercentageInput, document.getElementById('waardestijging')].forEach(input => {
@@ -109,7 +126,7 @@ document.addEventListener('DOMContentLoaded', function () {
              ltvVermogensgroeiInput, rentePercentageVermogensgroeiInput, huurrendementVermogensgroeiInput,
              huurstijgingVermogensgroeiInput, kostenPercentageVermogensgroeiInput, waardestijgingVermogensgroeiInput,
              herinvesteerWaardestijgingVermogensgroeiInput, comfortNiveau1Input, comfortNiveau2Input,
-             comfortNiveau3Input, minimaalInkomenInput, minimaalInkomenInflatieInput].forEach(input => {
+             comfortNiveau3Input, minimaalInkomenInput, minimaalInkomenInflatieInput, aankoopFrequentieInput].forEach(input => {
                 input.addEventListener('change', () => {
                     berekenVermogensgroei();
                     saveVermogensgroeiWaarden();

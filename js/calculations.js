@@ -58,209 +58,221 @@ function berekenScenarioResultaten() {
 }
 
 function berekenVermogensgroei() {
-    const startEigenVermogen = parseFloat(document.getElementById('startEigenVermogen').value);
-    const pandwaarde = parseFloat(document.getElementById('pandwaarde').value);
-    const looptijd = parseInt(document.getElementById('looptijdVermogensgroei').value);
-    const isHolding = document.getElementById('structuurVermogensgroei').value === 'holding';
-    const ltv = parseFloat(document.getElementById('ltvVermogensgroei').value) / 100;
-    const rentePercentage = parseFloat(document.getElementById('rentePercentageVermogensgroei').value) / 100;
-    const huurrendement = parseFloat(document.getElementById('huurrendementVermogensgroei').value) / 100;
-    const huurstijging = parseFloat(document.getElementById('huurstijgingVermogensgroei').value) / 100;
-    const kostenPercentage = parseFloat(document.getElementById('kostenPercentageVermogensgroei').value) / 100;
-    const waardestijging = parseFloat(document.getElementById('waardestijgingVermogensgroei').value) / 100;
-    const herinvesteerWaardestijging = document.getElementById('herinvesteerWaardestijgingVermogensgroei').checked;
-    const minimaalInkomen = parseFloat(document.getElementById('minimaalInkomen').value);
-    const minimaalInkomenInflatie = parseFloat(document.getElementById('minimaalInkomenInflatie').value) / 100;
+    // Haal waarden op uit de input velden
+    const startEigenVermogen = parseFloat(document.getElementById('startEigenVermogen')?.value || 0);
+    const pandwaarde = parseFloat(document.getElementById('pandwaarde')?.value || 0);
+    const looptijd = parseInt(document.getElementById('looptijdVermogensgroei')?.value || 0);
+    const ltv = parseFloat(document.getElementById('ltvVermogensgroei')?.value || 0) / 100;
+    const rentePercentage = parseFloat(document.getElementById('rentePercentageVermogensgroei')?.value || 0) / 100;
+    const huurrendement = parseFloat(document.getElementById('huurrendementVermogensgroei')?.value || 0) / 100;
+    const huurstijging = parseFloat(document.getElementById('huurstijgingVermogensgroei')?.value || 0) / 100;
+    const kostenPercentage = parseFloat(document.getElementById('kostenPercentageVermogensgroei')?.value || 0) / 100;
+    const waardestijging = parseFloat(document.getElementById('waardestijgingVermogensgroei')?.value || 0) / 100;
+    const minimaalInkomen = parseFloat(document.getElementById('minimaalInkomen')?.value || 0);
+    const minimaalInkomenInflatie = parseFloat(document.getElementById('minimaalInkomenInflatie')?.value || 0) / 100;
+    const aankoopFrequentie = parseInt(document.getElementById('aankoopFrequentie')?.value || 12); // Nieuwe invoer: frequentie in maanden
 
-    // Bereken initiële situatie
-    const totaleVastgoedwaarde = startEigenVermogen / (1 - ltv);
-    const hypotheek = totaleVastgoedwaarde - startEigenVermogen;
-    const aantalWoningen = Math.floor(totaleVastgoedwaarde / pandwaarde);
+    // Initialiseer arrays voor de resultaten
+    const jaren = [];
+    const vastgoedwaarden = [];
+    const nettoInkomens = [];
+    const eigenVermogens = [];
+    const overwaardes = [];
+    const nietGebruikteCashflows = [];
+    const roes = [];
+    const totaalRendementen = [];
+    const aantalPanden = [];
+    const minimaalInkomens = [];
+    const minimaalInkomensJaar = [];
 
-    // Bereken initieel netto inkomen
-    let initieelNettoInkomen;
-    if (isHolding) {
-        const rentePrive = parseFloat(document.getElementById('rentePriveVermogensgroei').value) / 100;
-        const vennootschapsbelasting = parseFloat(document.getElementById('vennootschapsbelastingVermogensgroei').value) / 100;
-        const huurInkomsten = totaleVastgoedwaarde * huurrendement;
-        const hypotheekRente = hypotheek * rentePercentage;
-        const onderhoudskosten = totaleVastgoedwaarde * kostenPercentage;
-        const vennootschapsbelastingBedrag = rentePrive * vennootschapsbelasting;
-        initieelNettoInkomen = huurInkomsten - hypotheekRente - onderhoudskosten - vennootschapsbelastingBedrag;
-    } else {
-        const huurInkomsten = totaleVastgoedwaarde * huurrendement;
-        const hypotheekRente = hypotheek * rentePercentage;
-        const onderhoudskosten = totaleVastgoedwaarde * kostenPercentage;
-        initieelNettoInkomen = huurInkomsten - hypotheekRente - onderhoudskosten;
-    }
-
-    // Bereken rendement per 100k eigen vermogen
-    const rendementPer100k = (initieelNettoInkomen / startEigenVermogen) * 100000;
-    const rendementPercentage = (initieelNettoInkomen / startEigenVermogen) * 100;
-
-    // Bereken projectie per jaar
-    const projectie = [];
-    let huidigePortfolioWaarde = totaleVastgoedwaarde;
+    // Bereken initiële waardes
+    let huidigeVastgoedwaarde = startEigenVermogen / (1 - ltv);
     let huidigEigenVermogen = startEigenVermogen;
-    let huidigePandwaarde = pandwaarde;
-    let breakEvenJaar = null;
-    let comfortNiveau1Jaar = null;
-    let comfortNiveau2Jaar = null;
-    let comfortNiveau3Jaar = null;
-    let spaarpotVoorHerinvestering = 0;
-    let aantalPanden = Math.floor(totaleVastgoedwaarde / pandwaarde);
+    let huidigHypotheek = huidigeVastgoedwaarde - startEigenVermogen;
+    let huidigOverwaarde = 0;
+    let huidigNietGebruikteCashflow = 0;
+    let cumulatieveOverwaarde = 0;
+    let huidigAantalPanden = Math.ceil(huidigeVastgoedwaarde / pandwaarde);
+    
+    if (huidigAantalPanden < 1) huidigAantalPanden = 1;
+    
+    huidigeVastgoedwaarde = huidigAantalPanden * pandwaarde;
+    huidigHypotheek = huidigeVastgoedwaarde * ltv;
 
-    for (let jaar = 0; jaar <= looptijd; jaar++) {
-        // Update pandwaarde met waardestijging
-        huidigePandwaarde *= (1 + waardestijging);
+    // Update initiële resultaten (alleen vastgoedwaarde en eigen vermogen)
+    jaren.push('START');
+    vastgoedwaarden.push(Math.round(huidigeVastgoedwaarde));
+    eigenVermogens.push(Math.round(huidigEigenVermogen));
+    aantalPanden.push(huidigAantalPanden);
+    
+    // Overige waardes zijn nog niet relevant bij start
+    nettoInkomens.push(null);
+    overwaardes.push(null);
+    nietGebruikteCashflows.push(null);
+    roes.push(null);
+    totaalRendementen.push(null);
+    minimaalInkomens.push(null);
+    minimaalInkomensJaar.push(null);
 
-        // Bereken inkomen voor dit jaar
-        let gegenereerdInkomen;
-        if (isHolding) {
-            const rentePrive = parseFloat(document.getElementById('rentePriveVermogensgroei').value) / 100;
-            const vennootschapsbelasting = parseFloat(document.getElementById('vennootschapsbelastingVermogensgroei').value) / 100;
-            const huurInkomsten = huidigePortfolioWaarde * huurrendement;
-            const hypotheekRente = hypotheek * rentePercentage;
-            const onderhoudskosten = huidigePortfolioWaarde * kostenPercentage;
-            const vennootschapsbelastingBedrag = rentePrive * vennootschapsbelasting;
-            gegenereerdInkomen = huurInkomsten - hypotheekRente - onderhoudskosten - vennootschapsbelastingBedrag;
-        } else {
-            const huurInkomsten = huidigePortfolioWaarde * huurrendement;
-            const hypotheekRente = hypotheek * rentePercentage;
-            const onderhoudskosten = huidigePortfolioWaarde * kostenPercentage;
-            gegenereerdInkomen = huurInkomsten - hypotheekRente - onderhoudskosten;
-        }
+    // Berekeningen voor jaar 1
+    // Update waardes met inflatie (cumulatief)
+    const minimaalInkomenDitJaar = minimaalInkomen;  // In jaar 1 nog geen inflatie
+    const minimaalInkomenJaar = minimaalInkomenDitJaar * 12; // Jaar inkomen
+    
+    // Bereken waardestijging voor jaar 1
+    const waardestijgingBedrag = Math.round(huidigeVastgoedwaarde * waardestijging);
+    huidigeVastgoedwaarde += waardestijgingBedrag;
+    
+    // Bereken netto inkomen voor jaar 1
+    const huur = huidigeVastgoedwaarde * huurrendement;
+    const kosten = huidigeVastgoedwaarde * kostenPercentage;
+    const rente = huidigHypotheek * rentePercentage;
+    const huidigNettoInkomen = Math.round(huur - kosten - rente);
+    
+    // Controleer of het inkomen voldoende is t.o.v. minimaal inkomen
+    let effectiefNettoInkomen = huidigNettoInkomen;
+    
+    // Bereken overwaarde voor jaar 1 (cumulatief)
+    huidigOverwaarde = waardestijgingBedrag;
+    cumulatieveOverwaarde = waardestijgingBedrag;
+    
+    // Bereken niet-gebruikte cashflow voor jaar 1
+    let nietGebruikteCashflow = 0;
+    if (huidigNettoInkomen > minimaalInkomenJaar) {
+        nietGebruikteCashflow = Math.round(huidigNettoInkomen - minimaalInkomenJaar);
+    }
+    
+    // Update eigen vermogen voor jaar 1 (vastgoedwaarde - hypotheek)
+    huidigEigenVermogen = Math.round(huidigeVastgoedwaarde - huidigHypotheek);
+    
+    // Bereken ROE en totaal rendement voor jaar 1
+    const roe = (huidigNettoInkomen / huidigEigenVermogen) * 100;
+    const totaalRendement = roe + (waardestijging * 100);
+    
+    // Voeg jaar 1 resultaten toe
+    jaren.push(1);
+    vastgoedwaarden.push(Math.round(huidigeVastgoedwaarde));
+    nettoInkomens.push(Math.round(effectiefNettoInkomen));
+    eigenVermogens.push(Math.round(huidigEigenVermogen));
+    overwaardes.push(Math.round(cumulatieveOverwaarde));  // Gebruik cumulatieve overwaarde
+    nietGebruikteCashflows.push(Math.round(nietGebruikteCashflow));
+    roes.push(roe);
+    totaalRendementen.push(totaalRendement);
+    aantalPanden.push(huidigAantalPanden);
+    minimaalInkomens.push(Math.round(minimaalInkomenDitJaar));
+    minimaalInkomensJaar.push(Math.round(minimaalInkomenJaar));
 
-        // Bereken maandelijks inkomen en herinvestering
-        const maandelijksInkomen = gegenereerdInkomen / 12;
+    // Bereken voor jaar 2 en verder
+    for (let jaar = 2; jaar <= looptijd; jaar++) {
+        // Update waardes met inflatie (cumulatief)
         const minimaalInkomenDitJaar = minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar);
-        let herinvesterenBedrag = 0;
+        const minimaalInkomenJaar = minimaalInkomenDitJaar * 12; // Jaar inkomen
+        
+        minimaalInkomens.push(Math.round(minimaalInkomenDitJaar));
+        minimaalInkomensJaar.push(Math.round(minimaalInkomenJaar));
 
-        // Bereken hoeveel er beschikbaar is voor herinvestering
-        const jaarlijksMinimaalInkomen = minimaalInkomenDitJaar * 12;
-        let beschikbaarVoorHerinvestering = 0;
-
-        // Als er meer inkomen is dan het minimale inkomen, wordt het overschot gespaard
-        if (gegenereerdInkomen > jaarlijksMinimaalInkomen) {
-            beschikbaarVoorHerinvestering = gegenereerdInkomen - jaarlijksMinimaalInkomen;
-            spaarpotVoorHerinvestering += beschikbaarVoorHerinvestering;
+        // Bereken waardestijging
+        const waardestijgingBedrag = Math.round(huidigeVastgoedwaarde * waardestijging);
+        huidigeVastgoedwaarde += waardestijgingBedrag;
+        
+        // Bereken nieuwe huurinkomsten met huurstijging (cumulatief)
+        const huur = huidigeVastgoedwaarde * huurrendement * Math.pow(1 + huurstijging, jaar - 1);
+        const kosten = huidigeVastgoedwaarde * kostenPercentage;
+        const rente = huidigHypotheek * rentePercentage;
+        const huidigNettoInkomen = Math.round(huur - kosten - rente);
+        
+        // Bereken niet-gebruikte cashflow en overwaarde
+        cumulatieveOverwaarde += waardestijgingBedrag;
+        
+        // Niet-gebruikte cashflow alleen als er inkomen over is
+        let huidigNietGebruikteCashflow = 0;
+        if (huidigNettoInkomen > minimaalInkomenJaar) {
+            huidigNietGebruikteCashflow = Math.round(huidigNettoInkomen - minimaalInkomenJaar);
         }
 
-        // Elke 3 jaar herinvesteren (vanaf jaar 3)
-        if (jaar > 0 && jaar % 3 === 0) {
-            if (jaar === 3) {
-                console.log('Herinvestering jaar 3:');
-                console.log('Spaarpot beschikbaar:', spaarpotVoorHerinvestering);
-            }
-
-            // Het gespaarde bedrag wordt gebruikt als eigen vermogen voor nieuwe investering
-            const nieuwInvesteringsBedrag = spaarpotVoorHerinvestering / (1 - ltv);
-            herinvesterenBedrag = nieuwInvesteringsBedrag;
-            const nieuweAantalPanden = Math.floor(nieuwInvesteringsBedrag / huidigePandwaarde);
+        // Check of het tijd is om een nieuw pand te kopen (op basis van aankoopfrequentie)
+        const maandenSindsStart = (jaar - 1) * 12;
+        const isAankoopMoment = maandenSindsStart % aankoopFrequentie === 0 && maandenSindsStart > 0;
+        
+        let nieuweHuur = huur;
+        let nieuweKosten = kosten;
+        let nieuweRente = rente;
+        let nieuwNettoInkomen = huidigNettoInkomen;
+        
+        // Bereken nieuwe investeringen met beschikbaar kapitaal
+        const beschikbaarVoorInvestering = huidigNietGebruikteCashflow + cumulatieveOverwaarde;
+        const benodigdEigenVermogenPerPand = pandwaarde * (1 - ltv);
+        
+        // Alleen investeren als het een aankoopmoment is EN er genoeg kapitaal is
+        if (isAankoopMoment && beschikbaarVoorInvestering >= benodigdEigenVermogenPerPand) {
+            const aantalNieuwePanden = Math.floor(beschikbaarVoorInvestering / benodigdEigenVermogenPerPand);
+            const gebruiktInvesteringsbedrag = aantalNieuwePanden * benodigdEigenVermogenPerPand;
+            const nieuweInvestering = aantalNieuwePanden * pandwaarde;
             
-            if (jaar === 3) {
-                console.log('Nieuw investeringsbedrag:', nieuwInvesteringsBedrag);
-                console.log('Nieuwe aantal panden:', nieuweAantalPanden);
-                console.log('Huidige pandwaarde:', huidigePandwaarde);
-            }
-
-            aantalPanden += nieuweAantalPanden;
-            spaarpotVoorHerinvestering = 0; // Reset spaarpot na herinvestering
-        }
-
-        // Update portfolio met herinvestering en waardestijging
-        const oudePortfolioWaarde = huidigePortfolioWaarde;
-        
-        // Voeg eerst nieuwe investering toe (als die er is)
-        huidigePortfolioWaarde += herinvesterenBedrag;
-        
-        // Dan pas waardestijging toepassen
-        const waardeVoorStijging = huidigePortfolioWaarde;
-        huidigePortfolioWaarde *= (1 + waardestijging);
-        const waardeStijgingBedrag = huidigePortfolioWaarde - waardeVoorStijging;
-
-        // Als waardestijging moet worden hergeïnvesteerd, voeg de volledige waardestijging toe aan spaarpot
-        if (herinvesteerWaardestijging) {
-            spaarpotVoorHerinvestering += waardeStijgingBedrag;
-        }
-        
-        const oudeEigenVermogen = huidigEigenVermogen;
-        huidigEigenVermogen = huidigePortfolioWaarde * (1 - ltv);
-
-        if (jaar === 3) {
-            console.log('Portfolio update jaar 3:');
-            console.log('Oude portfolio waarde:', oudePortfolioWaarde);
-            console.log('Na herinvestering:', waardeVoorStijging);
-            console.log('Waardestijging bedrag:', waardeStijgingBedrag);
-            console.log('Nieuwe portfolio waarde:', huidigePortfolioWaarde);
-            if (herinvesteerWaardestijging) {
-                console.log('Waardestijging naar spaarpot:', waardeStijgingBedrag);
+            // Voeg nieuwe panden toe
+            huidigeVastgoedwaarde += nieuweInvestering;
+            huidigHypotheek += nieuweInvestering * ltv;
+            huidigAantalPanden += aantalNieuwePanden;
+            
+            // Herbereken inkomen met nieuwe panden
+            nieuweHuur = huidigeVastgoedwaarde * huurrendement * Math.pow(1 + huurstijging, jaar - 1);
+            nieuweKosten = huidigeVastgoedwaarde * kostenPercentage;
+            nieuweRente = huidigHypotheek * rentePercentage;
+            nieuwNettoInkomen = Math.round(nieuweHuur - nieuweKosten - nieuweRente);
+            
+            // Reset cumulatieve overwaarde na investering
+            cumulatieveOverwaarde = beschikbaarVoorInvestering - gebruiktInvesteringsbedrag;
+            
+            // Herbereken niet-gebruikte cashflow met nieuwe inkomen
+            if (nieuwNettoInkomen > minimaalInkomenJaar) {
+                huidigNietGebruikteCashflow = Math.round(nieuwNettoInkomen - minimaalInkomenJaar);
+            } else {
+                huidigNietGebruikteCashflow = 0;
             }
         }
 
-        projectie.push({
-            jaar: jaar,
-            vastgoedwaarde: huidigePortfolioWaarde,
-            nettoInkomen: Math.min(maandelijksInkomen, minimaalInkomenDitJaar),
-            eigenVermogen: huidigEigenVermogen,
-            eigenVermogenStijging: jaar === 0 ? huidigEigenVermogen - startEigenVermogen : huidigEigenVermogen - projectie[jaar-1].eigenVermogen,
-            aantalPanden: aantalPanden,
-            beschikbaarVoorHerinvestering: spaarpotVoorHerinvestering,
-            roe: jaar === 0 ? (gegenereerdInkomen / startEigenVermogen) * 100 : (gegenereerdInkomen / projectie[jaar-1].eigenVermogen) * 100,
-            totaalRendement: jaar === 0 ? 
-                ((gegenereerdInkomen + (huidigePortfolioWaarde * waardestijging)) / startEigenVermogen) * 100 :
-                ((gegenereerdInkomen + (huidigePortfolioWaarde * waardestijging)) / projectie[jaar-1].eigenVermogen) * 100
+        // Update eigen vermogen (vastgoedwaarde - hypotheek)
+        huidigEigenVermogen = Math.round(huidigeVastgoedwaarde - huidigHypotheek);
+
+        // Bereken ROE en totaal rendement
+        const huidigeRoe = (nieuwNettoInkomen / huidigEigenVermogen) * 100;
+        const huidigTotaalRendement = huidigeRoe + (waardestijging * 100);
+
+        // Update resultaten
+        jaren.push(jaar);
+        vastgoedwaarden.push(Math.round(huidigeVastgoedwaarde));
+        nettoInkomens.push(Math.round(nieuwNettoInkomen));
+        eigenVermogens.push(Math.round(huidigEigenVermogen));
+        overwaardes.push(Math.round(cumulatieveOverwaarde));  // Gebruik cumulatieve overwaarde
+        nietGebruikteCashflows.push(Math.round(huidigNietGebruikteCashflow));
+        roes.push(huidigeRoe);
+        totaalRendementen.push(huidigTotaalRendement);
+        aantalPanden.push(huidigAantalPanden);
+
+        // Console logging voor debugging
+        console.log(`Jaar ${jaar} details:`, {
+            minimaalInkomenDitJaar: Math.round(minimaalInkomenDitJaar),
+            minimaalInkomenJaar: Math.round(minimaalInkomenJaar),
+            huidigNettoInkomen: Math.round(nieuwNettoInkomen),
+            huidigNietGebruikteCashflow: Math.round(huidigNietGebruikteCashflow),
+            waardestijgingBedrag: Math.round(waardestijgingBedrag),
+            cumulatieveOverwaarde: Math.round(cumulatieveOverwaarde),
+            isAankoopMoment: isAankoopMoment,
+            beschikbaarVoorInvestering: Math.round(beschikbaarVoorInvestering),
+            huidigeVastgoedwaarde: Math.round(huidigeVastgoedwaarde),
+            huidigEigenVermogen: Math.round(huidigEigenVermogen),
+            huidigAantalPanden,
+            huur: Math.round(nieuweHuur),
+            kosten: Math.round(nieuweKosten),
+            rente: Math.round(nieuweRente),
+            'Verschil met minimaal inkomen': Math.round(nieuwNettoInkomen - minimaalInkomenJaar)
         });
-
-        // Check break-even punt
-        if (!breakEvenJaar && gegenereerdInkomen >= startEigenVermogen) {
-            breakEvenJaar = jaar;
-        }
-
-        // Check comfortniveaus
-        const comfortNiveau1Bedrag = parseFloat(document.getElementById('comfortNiveau1').value);
-        const comfortNiveau2Bedrag = parseFloat(document.getElementById('comfortNiveau2').value);
-        const comfortNiveau3Bedrag = parseFloat(document.getElementById('comfortNiveau3').value);
-
-        if (!comfortNiveau1Jaar && maandelijksInkomen >= comfortNiveau1Bedrag) {
-            comfortNiveau1Jaar = jaar;
-            if (jaar === 4) {
-                console.log('Comfort niveau 1 bereikt in jaar 4:');
-                console.log('Maandelijks inkomen:', maandelijksInkomen);
-                console.log('Comfort niveau 1 bedrag:', comfortNiveau1Bedrag);
-            }
-        }
-        if (!comfortNiveau2Jaar && maandelijksInkomen >= comfortNiveau2Bedrag) {
-            comfortNiveau2Jaar = jaar;
-            if (jaar === 4) {
-                console.log('Comfort niveau 2 bereikt in jaar 4:');
-                console.log('Maandelijks inkomen:', maandelijksInkomen);
-                console.log('Comfort niveau 2 bedrag:', comfortNiveau2Bedrag);
-            }
-        }
-        if (!comfortNiveau3Jaar && maandelijksInkomen >= comfortNiveau3Bedrag) {
-            comfortNiveau3Jaar = jaar;
-            if (jaar === 7) {
-                console.log('Comfort niveau 3 bereikt in jaar 7:');
-                console.log('Maandelijks inkomen:', maandelijksInkomen);
-                console.log('Comfort niveau 3 bedrag:', comfortNiveau3Bedrag);
-            }
-        }
     }
 
-    // Update UI
-    updateVermogensgroeiUI(
-        totaleVastgoedwaarde,
-        aantalWoningen,
-        initieelNettoInkomen,
-        breakEvenJaar,
-        projectie,
-        comfortNiveau1Jaar,
-        comfortNiveau2Jaar,
-        comfortNiveau3Jaar,
-        rendementPer100k,
-        rendementPercentage
-    );
+    // Update de UI met de resultaten
+    updateVermogensgroeiTabel(jaren, vastgoedwaarden, nettoInkomens, eigenVermogens, overwaardes, nietGebruikteCashflows, roes, totaalRendementen, aantalPanden, minimaalInkomensJaar);
+    updateVermogensgroeiChart(jaren, vastgoedwaarden, eigenVermogens, overwaardes, nietGebruikteCashflows);
+    updateInkomenChart(jaren, nettoInkomens, minimaalInkomen, minimaalInkomenInflatie);
 }
 
 function updateVermogensgroeiUI(
@@ -304,50 +316,193 @@ function formatBedrag(bedrag) {
     }).format(bedrag);
 }
 
-function updateVermogensgroeiTabel(projectie) {
-    const table = document.getElementById('vermogensgroeiTabel');
-    const thead = table.querySelector('thead') || document.createElement('thead');
-    const tbody = table.querySelector('tbody') || document.createElement('tbody');
+function updateVermogensgroeiTabel(jaren, vastgoedwaarden, nettoInkomens, eigenVermogens, overwaardes, nietGebruikteCashflows, roes, totaalRendementen, aantalPanden, minimaalInkomensJaar) {
+    const tabel = document.getElementById('vermogensgroeiTabel')?.parentElement;
+    if (!tabel) return;
 
-    // Update thead
+    // Voeg tabelkop toe
+    const thead = tabel.querySelector('thead') || document.createElement('thead');
     thead.innerHTML = `
         <tr>
             <th>Jaar</th>
-            <th>Vastgoedwaarde</th>
-            <th>Netto inkomen</th>
+            <th>Vastgoedwaarde (Overwaarde)</th>
+            <th>Netto inkomen/maand</th>
             <th>Eigen vermogen</th>
-            <th>EV stijging</th>
-            <th>Spaarpot</th>
+            <th>Vermogensgroei</th>
+            <th>Niet-gebruikte cashflow</th>
             <th>Aantal panden</th>
-            <th>ROE (Totaal)</th>
+            <th>ROE</th>
+            <th>Totaal rendement</th>
         </tr>
     `;
+    if (!tabel.querySelector('thead')) {
+        tabel.insertBefore(thead, tabel.firstChild);
+    }
 
-    // Update tbody
+    // Update stats bovenaan
+    const minimaalInkomen = parseFloat(document.getElementById('minimaalInkomen')?.value || 0);
+    
+    // Veilig bijwerken van statistieken
+    const updateElement = (id, value) => {
+        const element = document.getElementById(id);
+        if (element) element.textContent = value;
+    };
+
+    // Update alle statistieken bovenaan de pagina
+    updateElement('totaleVastgoedwaarde', formatBedrag(vastgoedwaarden[0]));
+    updateElement('totaleVastgoedwaardeVermogensgroei', formatBedrag(vastgoedwaarden[0]));
+    updateElement('aantalWoningen', aantalPanden[0]);
+    updateElement('aantalWoningenVermogensgroei', aantalPanden[0]);
+    
+    // Gebruik nettoInkomens[1] voor het eerste jaar inkomen (per maand)
+    updateElement('initieelNettoInkomen', formatBedrag(nettoInkomens[1] ? nettoInkomens[1] / 12 : 0));
+    
+    // Bereken break-even punt
+    const breakEvenJaar = jaren.findIndex((jaar, i) => 
+        i > 0 && 
+        nettoInkomens[i] >= (minimaalInkomensJaar?.[i] || minimaalInkomen * 12)
+    );
+    updateElement('breakEvenPunt', breakEvenJaar >= 0 ? breakEvenJaar : '-');
+    
+    // Bereken rendement per €100k voor jaar 1
+    let rendementPer100k = 0;
+    let rendementPercentage = 0;
+    if (nettoInkomens[1] && eigenVermogens[0]) {
+        rendementPer100k = (nettoInkomens[1] / eigenVermogens[0]) * 100000;
+        rendementPercentage = (rendementPer100k / 100000) * 100;
+    }
+    const rendementFormatted = `${formatBedrag(rendementPer100k)} (${rendementPercentage.toFixed(1)}%)`;
+    updateElement('rendementJaar1Per100k', rendementFormatted);
+    updateElement('rendementPer100k', rendementFormatted);
+    
+    // Update eindvermogen statistieken
+    updateElement('eigenVermogenEindeLooptijd', formatBedrag(eigenVermogens[eigenVermogens.length - 1]));
+    updateElement('totalePortfolioWaarde', formatBedrag(eigenVermogens[eigenVermogens.length - 1]));
+
+    // Update tabelinhoud
+    const tbody = document.getElementById('vermogensgroeiTabel');
+    if (!tbody) return;
+
     tbody.innerHTML = '';
+    
+    jaren.forEach((jaar, index) => {
+        // Console logging voor debugging
+        console.log(`Jaar ${jaar}:`, {
+            vastgoedwaarde: vastgoedwaarden[index],
+            overwaarde: overwaardes[index],
+            nettoInkomen: nettoInkomens[index],
+            nettoInkomenPerMaand: nettoInkomens[index] ? Math.round(nettoInkomens[index] / 12) : null,
+            eigenVermogen: eigenVermogens[index],
+            vermogensgroei: index === 0 ? 0 : eigenVermogens[index] - eigenVermogens[index - 1],
+            nietGebruikteCashflow: nietGebruikteCashflows[index],
+            aantalPanden: aantalPanden[index],
+            roe: roes[index],
+            totaalRendement: totaalRendementen[index],
+            minimaalInkomenPerMaand: minimaalInkomensJaar && minimaalInkomensJaar[index] ? Math.round(minimaalInkomensJaar[index] / 12) : minimaalInkomen
+        });
 
-    // Zorg ervoor dat thead en tbody in de tabel zitten
-    if (!table.contains(thead)) table.appendChild(thead);
-    if (!table.contains(tbody)) table.appendChild(tbody);
-
-    const minimaalInkomen = parseFloat(document.getElementById('minimaalInkomen').value);
-    const minimaalInkomenInflatie = parseFloat(document.getElementById('minimaalInkomenInflatie').value) / 100;
-
-    projectie.forEach(jaar => {
-        const minimaalInkomenDitJaar = minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar.jaar);
-        const percentageVanMinimaal = (jaar.nettoInkomen / minimaalInkomenDitJaar) * 100;
         const row = document.createElement('tr');
-        row.innerHTML = `
-            <td>${jaar.jaar +1}</td>
-            <td>${formatBedrag(jaar.vastgoedwaarde)}</td>
-            <td>${formatBedrag(jaar.nettoInkomen)} van ${formatBedrag(minimaalInkomenDitJaar)} (${percentageVanMinimaal.toFixed(1)}%)</td>
-            <td>${formatBedrag(jaar.eigenVermogen)}</td>
-            <td>${formatBedrag(jaar.eigenVermogenStijging)}</td>
-            <td>${formatBedrag(jaar.beschikbaarVoorHerinvestering)}</td>
-            <td>${jaar.aantalPanden}</td>
-            <td>${jaar.roe.toFixed(1)}% (${jaar.totaalRendement.toFixed(1)}%)</td>
-        `;
+        
+        // Voor STARTpunt speciale weergave (alleen vastgoedwaarde en eigen vermogen)
+        if (jaar === 'START') {
+            row.innerHTML = `
+                <td>${jaar}</td>
+                <td>${formatBedrag(vastgoedwaarden[index])}</td>
+                <td>-</td>
+                <td>${formatBedrag(eigenVermogens[index])}</td>
+                <td>-</td>
+                <td>-</td>
+                <td>${aantalPanden[index]}</td>
+                <td>-</td>
+                <td>-</td>
+            `;
+        } else {
+            // Toon cumulatieve overwaarde
+            const nettoInkomenPerMaand = nettoInkomens[index] ? Math.round(nettoInkomens[index] / 12) : 0;
+            // Minimaal inkomen aangepast met inflatie per maand
+            const minimaalInkomenDisplay = minimaalInkomensJaar && minimaalInkomensJaar[index] ? 
+                Math.round(minimaalInkomensJaar[index] / 12) : minimaalInkomen;
+                
+            row.innerHTML = `
+                <td>${jaar}</td>
+                <td>${formatBedrag(vastgoedwaarden[index])} (${formatBedrag(overwaardes[index])})</td>
+                <td>${formatBedrag(nettoInkomenPerMaand)} / ${formatBedrag(minimaalInkomenDisplay)}</td>
+                <td>${formatBedrag(eigenVermogens[index])}</td>
+                <td>${formatBedrag(eigenVermogens[index] - eigenVermogens[index - 1])}</td>
+                <td>${formatBedrag(nietGebruikteCashflows[index])}</td>
+                <td>${aantalPanden[index]}</td>
+                <td>${roes[index] ? roes[index].toFixed(1) + '%' : '-'}</td>
+                <td>${totaalRendementen[index] ? totaalRendementen[index].toFixed(1) + '%' : '-'}</td>
+            `;
+        }
+        
         tbody.appendChild(row);
+    });
+}
+
+function updateVermogensgroeiChart(jaren, vastgoedwaarden, eigenVermogens, overwaardes, nietGebruikteCashflows) {
+    const ctx = document.getElementById('vermogensgroeiChart');
+    if (!ctx) return;
+
+    // Verwijder bestaande chart als die er is
+    if (window.vermogensgroeiChart instanceof Chart) {
+        window.vermogensgroeiChart.destroy();
+    }
+
+    window.vermogensgroeiChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: jaren,
+            datasets: [
+                {
+                    label: 'Vastgoedwaarde',
+                    data: vastgoedwaarden,
+                    borderColor: 'rgb(75, 192, 192)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Eigen vermogen',
+                    data: eigenVermogens,
+                    borderColor: 'rgb(255, 99, 132)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Niet-gebruikte cashflow',
+                    data: nietGebruikteCashflows,
+                    borderColor: 'rgb(54, 162, 235)',
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatBedrag(value);
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += formatBedrag(context.parsed.y);
+                            }
+                            return label;
+                        }
+                    }
+                }
+            }
+        }
     });
 }
 
@@ -457,6 +612,78 @@ function updateVermogensgroeiGrafieken(projectie) {
                     callbacks: {
                         label: function(context) {
                             return `${context.dataset.label}: ${formatBedrag(context.raw)}`;
+                        }
+                    }
+                }
+            }
+        }
+    });
+}
+
+function updateInkomenChart(jaren, nettoInkomens, minimaalInkomen, minimaalInkomenInflatie) {
+    const ctx = document.getElementById('inkomenChart');
+    if (!ctx) return;
+
+    // Verwijder bestaande chart als die er is
+    if (window.inkomenChart instanceof Chart) {
+        window.inkomenChart.destroy();
+    }
+
+    // Bereken minimaal inkomen met cumulatieve inflatie
+    const minimaalInkomens = jaren.map((jaar, index) => {
+        if (jaar === 'START') return null;
+        
+        // Jaar 1 heeft nog geen inflatie
+        if (index === 1) return minimaalInkomen;
+        
+        // Vanaf jaar 2 wel inflatie
+        return minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, index - 1);
+    });
+
+    window.inkomenChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: jaren,
+            datasets: [
+                {
+                    label: 'Netto inkomen per maand',
+                    data: nettoInkomens.map(inkomen => inkomen ? inkomen / 12 : null),
+                    borderColor: 'rgb(153, 102, 255)',
+                    tension: 0.1
+                },
+                {
+                    label: 'Minimaal inkomen',
+                    data: minimaalInkomens,
+                    borderColor: 'rgb(255, 99, 132)',
+                    borderDash: [5, 5],
+                    tension: 0.1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return formatBedrag(value);
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            if (context.parsed.y !== null) {
+                                label += formatBedrag(context.parsed.y);
+                            }
+                            return label;
                         }
                     }
                 }
