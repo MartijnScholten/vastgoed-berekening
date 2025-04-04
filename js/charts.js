@@ -4,13 +4,22 @@
         // vermogensgroeiChart en inkomenChart zijn al gedeclareerd in calculations.js
 
         function berekenScenarioResultaten() {
-            const eigenVermogen = parseFloat(document.getElementById('eigenVermogen').value);
-            const ltv = parseFloat(document.getElementById('ltv').value) / 100;
-            const rentePercentage = parseFloat(document.getElementById('rentePercentage').value) / 100;
-            const vennootschapsbelasting = parseFloat(document.getElementById('vennootschapsbelasting').value) / 100;
-            const rentePrive = parseFloat(document.getElementById('rentePrive').value) / 100;
-            const isHolding = document.getElementById('structuur').value === 'holding';
-            const waardestijging = parseFloat(document.getElementById('waardestijging').value) / 100;
+            const eigenVermogenEl = document.getElementById('eigenVermogen');
+            const ltvEl = document.getElementById('ltv');
+            const rentePercentageEl = document.getElementById('rentePercentage');
+            const vennootschapsbelastingEl = document.getElementById('vennootschapsbelasting');
+            const rentePriveEl = document.getElementById('rentePrive');
+            const structuurEl = document.getElementById('structuur');
+            const waardestijgingEl = document.getElementById('waardestijging');
+
+            // Veilige waarden instellen als elementen niet bestaan
+            const eigenVermogen = eigenVermogenEl ? parseFloat(eigenVermogenEl.value) || 0 : 0;
+            const ltv = ltvEl ? parseFloat(ltvEl.value) / 100 || 0 : 0;
+            const rentePercentage = rentePercentageEl ? parseFloat(rentePercentageEl.value) / 100 || 0 : 0;
+            const vennootschapsbelasting = vennootschapsbelastingEl ? parseFloat(vennootschapsbelastingEl.value) / 100 || 0 : 0;
+            const rentePrive = rentePriveEl ? parseFloat(rentePriveEl.value) / 100 || 0 : 0;
+            const isHolding = structuurEl ? structuurEl.value === 'holding' : false;
+            const waardestijging = waardestijgingEl ? parseFloat(waardestijgingEl.value) / 100 || 0 : 0;
 
             // Bereken initiële situatie
             const totaleVastgoedwaarde = eigenVermogen / (1 - ltv);
@@ -61,10 +70,16 @@
 
         function updateCharts(scenarios) {
             // Update ROE Chart
-            const roeCtx = document.getElementById('roeChart').getContext('2d');
+            const roeChartEl = document.getElementById('roeChart');
+            if (!roeChartEl) return; // Stop als het element niet bestaat
+            
+            const roeCtx = roeChartEl.getContext('2d');
+            if (!roeCtx) return; // Stop als de context niet kan worden opgehaald
+            
             if (roeChart) {
                 roeChart.destroy();
             }
+            
             roeChart = new Chart(roeCtx, {
                 type: 'bar',
                 data: {
@@ -98,10 +113,16 @@
             });
 
             // Update Maandinkomen Chart
-            const maandinkomenCtx = document.getElementById('maandinkomenChart').getContext('2d');
+            const maandinkomenChartEl = document.getElementById('maandinkomenChart');
+            if (!maandinkomenChartEl) return; // Stop als het element niet bestaat
+            
+            const maandinkomenCtx = maandinkomenChartEl.getContext('2d');
+            if (!maandinkomenCtx) return; // Stop als de context niet kan worden opgehaald
+            
             if (maandinkomenChart) {
                 maandinkomenChart.destroy();
             }
+            
             maandinkomenChart = new Chart(maandinkomenCtx, {
                 type: 'bar',
                 data: {
@@ -141,6 +162,8 @@
 
         function updateScenarioTabel(scenarios) {
             const tbody = document.getElementById('scenarioTabel');
+            if (!tbody) return; // Stop als het element niet bestaat
+            
             tbody.innerHTML = '';
 
             scenarios.forEach(scenario => {

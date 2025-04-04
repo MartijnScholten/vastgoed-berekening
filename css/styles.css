@@ -373,10 +373,6 @@ tr:nth-child(even) {
   height: fit-content;
 }
 
-.results-panel {
-  min-width: 0; /* Voorkomt overflow problemen */
-}
-
 .charts-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
