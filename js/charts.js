@@ -1,8 +1,7 @@
     // Chart instances
         let roeChart = null;
         let maandinkomenChart = null;
-        let vermogensgroeiChart = null;
-        let inkomenChart = null;
+        // vermogensgroeiChart en inkomenChart zijn al gedeclareerd in calculations.js
 
         function berekenScenarioResultaten() {
             const eigenVermogen = parseFloat(document.getElementById('eigenVermogen').value);
@@ -129,6 +128,15 @@
                     }
                 }
             });
+        }
+
+        function formatBedrag(bedrag) {
+            return new Intl.NumberFormat('nl-NL', { 
+                style: 'currency', 
+                currency: 'EUR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+            }).format(bedrag);
         }
 
         function updateScenarioTabel(scenarios) {

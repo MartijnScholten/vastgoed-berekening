@@ -7,6 +7,23 @@
     <title>Vastgoed Calculator - Groeitab</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Compactere tabel stijlen */
+        table th, table td {
+            padding: 12px;
+            font-size: 0.95rem;
+        }
+        table th {
+            text-align: center;
+            white-space: nowrap;
+        }
+        table td {
+            text-align: right;
+        }
+        table td:first-child {
+            text-align: center;
+        }
+    </style>
 </head>
 
 <body>
@@ -151,17 +168,32 @@
                                 <div class="grid-col-1">
                                     <div class="form-group">
                                         <label for="startEigenVermogen">Start eigen vermogen (€):</label>
-                                        <input type="number" id="startEigenVermogen" value="500000" step="10000">
+                                        <input type="number" id="startEigenVermogen" value="250000" step="10000" min="0" title="Het bedrag waarmee je begint te investeren in vastgoed">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="pandwaarde">Gemiddelde pandwaarde (€):</label>
-                                        <input type="number" id="pandwaarde" value="350000" step="10000">
+                                        <label for="extraInlegJaren">Aantal jaren extra inleg:</label>
+                                        <input type="number" id="extraInlegJaren" value="3" step="1" min="0" title="Aantal jaren dat je extra geld inlegt bovenop je startkapitaal">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="extraInlegBedrag">Bedrag per jaar extra inleg (€):</label>
+                                        <input type="number" id="extraInlegBedrag" value="20000" step="1000" min="0" title="Het bedrag dat je jaarlijks extra inlegt gedurende het aantal opgegeven jaren">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="looptijdVermogensgroei">Looptijd berekening (jaren):</label>
-                                        <input type="number" id="looptijdVermogensgroei" value="30" step="1" min="1">
+                                        <label for="laatsteAankoopJaar">Laatste aankoopjaar (daarna alleen rendement):</label>
+                                        <input type="number" id="laatsteAankoopJaar" value="20" step="1" min="0" title="Na dit jaar stop je met het kopen van nieuwe panden en wordt de overwaarde toegevoegd aan je cashflow als extra rendement">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="pandwaarde">Pandwaarde (€):</label>
+                                        <input type="number" id="pandwaarde" value="350000" step="10000" min="0" title="De gemiddelde aankoopprijs van de panden waarin je investeert">
+                                    </div>
+
+                                    <div class="form-group">
+                                        <label for="looptijdVermogensgroei">Looptijd (jaren):</label>
+                                        <input type="number" id="looptijdVermogensgroei" value="20" min="1" max="50" step="1" title="Het aantal jaren waarvoor de projectie wordt berekend">
                                     </div>
 
                                     <div class="form-group">
@@ -174,33 +206,33 @@
 
                                     <div class="form-group">
                                         <label for="ltvVermogensgroei">Loan-to-Value (%):</label>
-                                        <input type="number" id="ltvVermogensgroei" value="75" min="0" max="100">
-                                        <span id="hefboomFactor" class="hefboom-indicator">(x4 hefboom)</span>
+                                        <input type="number" id="ltvVermogensgroei" value="75" min="0" max="100" step="1" title="Het percentage van de pandwaarde dat je financiert met een hypotheek">
+                                        <span id="hefboomFactor" class="hefboom-indicator">(x4.0 hefboom)</span>
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="rentePercentageVermogensgroei">Hypotheekrente (%):</label>
-                                        <input type="number" id="rentePercentageVermogensgroei" value="5" step="0.1" min="0">
+                                        <label for="rentePercentageVermogensgroei">Rentepercentage (%):</label>
+                                        <input type="number" id="rentePercentageVermogensgroei" value="4" step="0.1" min="0" title="Het rentepercentage dat je betaalt over je hypotheek">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="huurrendementVermogensgroei">Huurrendement (%):</label>
-                                        <input type="number" id="huurrendementVermogensgroei" value="6" step="0.1" min="0">
+                                        <input type="number" id="huurrendementVermogensgroei" value="7" step="0.1" min="0" title="Het bruto jaarlijkse huurrendement als percentage van de vastgoedwaarde">
                                     </div>
 
                                     <div class="form-group">
                                         <label for="huurstijgingVermogensgroei">Jaarlijkse huurstijging (%):</label>
-                                        <input type="number" id="huurstijgingVermogensgroei" value="2" step="0.1" min="0">
+                                        <input type="number" id="huurstijgingVermogensgroei" value="3" step="0.1" min="0" title="De jaarlijkse stijging van de huurinkomsten door indexatie">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="kostenPercentageVermogensgroei">Kosten percentage (%):</label>
-                                        <input type="number" id="kostenPercentageVermogensgroei" value="1.5" step="0.1" min="0">
+                                        <label for="kostenPercentageVermogensgroei">Kostenpercentage (%):</label>
+                                        <input type="number" id="kostenPercentageVermogensgroei" value="1.5" step="0.1" min="0" title="De jaarlijkse kosten van onderhoud, verzekeringen, belastingen, etc. als percentage van de vastgoedwaarde">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="waardestijgingVermogensgroei">Waardestijging vastgoed (%):</label>
-                                        <input type="number" id="waardestijgingVermogensgroei" value="5" step="0.1" min="0">
+                                        <label for="waardestijgingVermogensgroei">Waardestijging (%):</label>
+                                        <input type="number" id="waardestijgingVermogensgroei" value="5" step="0.1" min="0" title="De jaarlijkse stijging van de vastgoedwaarde, resulterend in overwaarde">
                                     </div>
                                 </div>
                             </div>
@@ -213,18 +245,20 @@
                                 <div class="grid-col-1">
                                     <div class="form-group">
                                         <label for="minimaalInkomen">Minimaal inkomen per maand (€):</label>
-                                        <input type="number" id="minimaalInkomen" value="5000" step="100">
+                                        <input type="number" id="minimaalInkomen" value="8000" step="100" min="0" title="Het maandelijkse inkomen dat je minimaal wilt ontvangen voor je levensonderhoud">
                                     </div>
 
                                     <div class="form-group">
-                                        <label for="minimaalInkomenInflatie">Jaarlijkse stijging minimaal inkomen (%):</label>
-                                        <input type="number" id="minimaalInkomenInflatie" value="2" step="0.1" min="0">
+                                        <label for="minimaalInkomenInflatie">Minimaal inkomen inflatie (%):</label>
+                                        <input type="number" id="minimaalInkomenInflatie" value="2" step="0.1" min="0" max="10" title="De jaarlijkse stijging van je minimale inkomensbehoefte door inflatie">
                                     </div>
                                     
                                     <div class="form-group">
                                         <label for="aankoopFrequentie">Aankoopfrequentie (maanden):</label>
-                                        <input type="number" id="aankoopFrequentie" value="36" step="1" min="1">
+                                        <input type="number" id="aankoopFrequentie" value="24" step="1" min="1" title="Het aantal maanden tussen aankoopmomenten - hoe vaak je nieuwe panden koopt als er voldoende kapitaal beschikbaar is">
                                     </div>
+                                    
+                                  
 
                             <div class="checkbox-container">
                                         <input type="checkbox" id="herinvesteerWaardestijgingVermogensgroei" checked>
@@ -353,10 +387,23 @@
                 </div>
 
                         <!-- Gedetailleerde Projectie -->
-                <div class="table-container">
+                <div id="tabelSection" class="table-container">
                     <table>
                         <thead>
-                           
+                           <tr id="vermogensgroeiTabel-header">
+                                <th>Jaar</th>
+                                <th>Inleg</th>
+                                <th>Vastgoedwaarde</th>
+                                <th>Hypotheek</th>
+                                <th>Aantal panden</th>
+                                <th>Netto inkomen/mnd</th>
+                                <th>Eigen in vastgoed</th>
+                                <th>Eigen vermogen</th>
+                                <th>Vermogensgroei</th>
+                                <th>Niet-gebruikt cashflow</th>
+                                <th>ROE %</th>
+                                <th>Totaal rendement %</th>
+                            </tr>
                         </thead>
                                 <tbody id="vermogensgroeiTabel">
                                     <!-- Hier komen de projectie rijen -->

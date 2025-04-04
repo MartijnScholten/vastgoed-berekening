@@ -27,6 +27,9 @@ document.addEventListener('DOMContentLoaded', function () {
             const minimaalInkomenInput = document.getElementById('minimaalInkomen');
             const minimaalInkomenInflatieInput = document.getElementById('minimaalInkomenInflatie');
             const aankoopFrequentieInput = document.getElementById('aankoopFrequentie');
+            const extraInlegJarenInput = document.getElementById('extraInlegJaren');
+            const extraInlegBedragInput = document.getElementById('extraInlegBedrag');
+            const laatsteAankoopJaarInput = document.getElementById('laatsteAankoopJaar');
 
             // Functie om vermogensgroei waardes op te slaan
             function saveVermogensgroeiWaarden() {
@@ -48,6 +51,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     minimaalInkomen: minimaalInkomenInput.value,
                     minimaalInkomenInflatie: minimaalInkomenInflatieInput.value,
                     aankoopFrequentie: aankoopFrequentieInput.value,
+                    extraInlegJaren: extraInlegJarenInput.value,
+                    extraInlegBedrag: extraInlegBedragInput.value,
+                    laatsteAankoopJaar: laatsteAankoopJaarInput.value,
                 };
                 localStorage.setItem('vermogensgroeiWaarden', JSON.stringify(waarden));
             }
@@ -96,6 +102,9 @@ document.addEventListener('DOMContentLoaded', function () {
             if (vermogensgroeiWaarden.minimaalInkomen) minimaalInkomenInput.value = vermogensgroeiWaarden.minimaalInkomen;
             if (vermogensgroeiWaarden.minimaalInkomenInflatie) minimaalInkomenInflatieInput.value = vermogensgroeiWaarden.minimaalInkomenInflatie;
             if (vermogensgroeiWaarden.aankoopFrequentie) aankoopFrequentieInput.value = vermogensgroeiWaarden.aankoopFrequentie;
+            if (vermogensgroeiWaarden.extraInlegJaren) extraInlegJarenInput.value = vermogensgroeiWaarden.extraInlegJaren;
+            if (vermogensgroeiWaarden.extraInlegBedrag) extraInlegBedragInput.value = vermogensgroeiWaarden.extraInlegBedrag;
+            if (vermogensgroeiWaarden.laatsteAankoopJaar) laatsteAankoopJaarInput.value = vermogensgroeiWaarden.laatsteAankoopJaar;
 
             // Functie om hefboomfactor te berekenen
             function updateHefboomFactor() {
@@ -115,8 +124,12 @@ document.addEventListener('DOMContentLoaded', function () {
             [eigenVermogenInput, ltvInput, rentePercentageInput, document.getElementById('waardestijging')].forEach(input => {
                 input.addEventListener('change', () => {
                     const resultaten = berekenScenarioResultaten();
-                    updateCharts(resultaten);
-                    updateScenarioTabel(resultaten);
+                    if (typeof updateCharts === 'function') {
+                        updateCharts(resultaten);
+                    }
+                    if (typeof updateScenarioTabel === 'function') {
+                        updateScenarioTabel(resultaten);
+                    }
                     saveScenarioWaarden();
                 });
             });
@@ -126,7 +139,8 @@ document.addEventListener('DOMContentLoaded', function () {
              ltvVermogensgroeiInput, rentePercentageVermogensgroeiInput, huurrendementVermogensgroeiInput,
              huurstijgingVermogensgroeiInput, kostenPercentageVermogensgroeiInput, waardestijgingVermogensgroeiInput,
              herinvesteerWaardestijgingVermogensgroeiInput, comfortNiveau1Input, comfortNiveau2Input,
-             comfortNiveau3Input, minimaalInkomenInput, minimaalInkomenInflatieInput, aankoopFrequentieInput].forEach(input => {
+             comfortNiveau3Input, minimaalInkomenInput, minimaalInkomenInflatieInput, aankoopFrequentieInput,
+             extraInlegJarenInput, extraInlegBedragInput].forEach(input => {
                 input.addEventListener('change', () => {
                     berekenVermogensgroei();
                     saveVermogensgroeiWaarden();
@@ -137,8 +151,12 @@ document.addEventListener('DOMContentLoaded', function () {
             structuurSelect.addEventListener('change', () => {
                 holdingInstellingen.style.display = structuurSelect.value === 'holding' ? 'block' : 'none';
                 const resultaten = berekenScenarioResultaten();
-                updateCharts(resultaten);
-                updateScenarioTabel(resultaten);
+                if (typeof updateCharts === 'function') {
+                    updateCharts(resultaten);
+                }
+                if (typeof updateScenarioTabel === 'function') {
+                    updateScenarioTabel(resultaten);
+                }
                 saveScenarioWaarden();
             });
 
@@ -176,7 +194,17 @@ document.addEventListener('DOMContentLoaded', function () {
 
             // Initialiseer berekeningen
             const resultaten = berekenScenarioResultaten();
-            updateCharts(resultaten);
-            updateScenarioTabel(resultaten);
+            if (typeof updateCharts === 'function') {
+                updateCharts(resultaten);
+            }
+            if (typeof updateScenarioTabel === 'function') {
+                updateScenarioTabel(resultaten);
+            }
             berekenVermogensgroei();
+
+            // Zorg dat het laatsteAankoopJaar veld ook een event listener krijgt
+            laatsteAankoopJaarInput.addEventListener('change', function() {
+                saveVermogensgroeiWaarden();
+                berekenVermogensgroei();
+            });
         });
