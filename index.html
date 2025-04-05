@@ -52,6 +52,8 @@
             display: none;
         }
     </style>
+    <!-- HTML2PDF library voor PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 </head>
 
 <body>
@@ -61,7 +63,9 @@
         <div class="tab-navigation">
             <button class="tab-button active" data-tab="vermogensgroei">Vermogensgroei & Inkomen</button>
             <button class="tab-button" data-tab="scenario">Scenario Analyse</button>
-            
+            <button class="tab-button id="exportPdfBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                Exporteer als PDF
+            </button>
             
         </div>
 
@@ -224,7 +228,7 @@
                         <div class="settings-section">
                             <div class="section-header" onclick="toggleSection(this.parentNode)">
                                 <span>Looptijd en planning</span>
-                                <span class="section-toggle">▼</span>
+                                
                             </div>
                             <div class="section-content">
                                 <div class="form-group">
@@ -256,7 +260,7 @@
                         <div class="settings-section">
                             <div class="section-header" onclick="toggleSection(this.parentNode)">
                                 <span>Waardes en stijgingen</span>
-                                <span class="section-toggle">▼</span>
+                                
                             </div>
                             <div class="section-content">
                                 <div class="form-group">
@@ -300,8 +304,8 @@
                         <!-- SECTIE 3: Extra inleg en inkomen -->
                         <div class="settings-section">
                             <div class="section-header" onclick="toggleSection(this.parentNode)">
-                                <span>Extra inleg en inkomen</span>
-                                <span class="section-toggle">▼</span>
+                                <span>Inleg en inkomen</span>
+                                
                             </div>
                             <div class="section-content">
                                 <div class="form-group">
@@ -363,8 +367,11 @@
 
                         <!-- Gedetailleerde Projectie -->
                 <div id="tabelSection" class="container mx-auto p-4 mt-8 hidden">
-                    <div class="mb-4">
+                    <div class="flex justify-between items-center mb-4">
                         <h2 class="text-xl font-bold">Gedetailleerde projectie</h2>
+                       
+                    </div>
+                    <div class="mb-4">
                         <div class="overflow-x-auto max-h-[600px] overflow-y-auto">
                             <table class="min-w-full bg-white border border-gray-300">
                                 <thead class="bg-gray-100">

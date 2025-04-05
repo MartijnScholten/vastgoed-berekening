@@ -296,7 +296,7 @@ tr:nth-child(even) {
 .settings-section {
   background-color: #f8fafc;
   border-radius: 8px;
-  padding: 20px;
+
   margin-bottom: 24px;
 }
 
@@ -304,13 +304,6 @@ tr:nth-child(even) {
   margin-bottom: 16px;
   color: #2d3748;
   font-size: 18px;
-}
-
-.checkbox-group {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 12px;
-  margin-top: 16px;
 }
 
 /* Legenda styling */

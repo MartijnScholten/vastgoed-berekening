@@ -149,6 +149,9 @@ function berekenVermogensgroei() {
         minimaalInkomenInflatie
     );
 
+    // Maak de projectie globaal beschikbaar voor de PDF export
+    window.huidigeProjectie = projectie;
+    
     // Update de UI met de resultaten
     updateVermogensgroeiTabel(projectie);
     updateVermogensgroeiGrafieken(projectie);
@@ -275,7 +278,7 @@ function updateVermogensgroeiUI(projectie) {
     
     projectie.forEach((jaar, index) => {
         // Nieuw table row element aanmaken
-        const row = document.createElement('tr');
+                const row = document.createElement('tr');
         
         // Voeg de highlight-row class toe aan elke derde rij (maar niet START)
         if (jaar.jaar !== "START" && jaar.jaar % 3 === 0) {
@@ -288,7 +291,7 @@ function updateVermogensgroeiUI(projectie) {
         
         // Voor STARTpunt speciale weergave (alleen vastgoedwaarde en eigen vermogen)
         if (jaar.jaar === "START") {
-            row.innerHTML = `
+                row.innerHTML = `
                 <td>${jaar.jaar}</td>
                 <td>
                     <span title="Startkapitaal: Het initiële eigen vermogen dat je investeert">
@@ -946,4 +949,4 @@ function berekenProjectie(
     }
     
     return projectie;
-}
+            }
