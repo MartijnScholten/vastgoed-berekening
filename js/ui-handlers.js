@@ -460,10 +460,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                 const extraHypotheek = jaar.hypotheek - vorigJaar.hypotheek;
                                 
                                 // Berekeningen voor inkomsten en kosten
-                                const huurPerPand = pandwaarde * huurrendement * Math.pow(1 + huurstijging, jaar.jaar - 1);
+                                const huurStijgingFactor = jaar.jaar === 1 ? 1 : Math.pow(1 + huurstijging, jaar.jaar - 1);
+                                const huurPerPand = pandwaarde * huurrendement * huurStijgingFactor;
                                 const kostenPerPand = pandwaarde * kostenPercentage;
                                 const hypotheekLastenPerPand = (pandwaarde * ltv) * rentePercentage;
                                 const nettoPerPand = huurPerPand - kostenPerPand - hypotheekLastenPerPand;
+                                
+                                // Berekening voor minimaal inkomen
+                                const minimaalInkomenDitJaar = jaar.jaar === 1 ? 
+                                    minimaalInkomen : 
+                                    minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar.jaar - 1);
                                 
                                 beschrijving = `
                                     <p><strong>Jaar ${jaar.jaar} - Overzicht:</strong></p>
@@ -490,12 +496,16 @@ document.addEventListener('DOMContentLoaded', function () {
                                     
                                     <p><strong>Inkomsten en cashflow:</strong></p>
                                     <ul>
-                                        <li>Huurinkomsten per pand: ${formatBedrag(huurPerPand)} per jaar</li>
-                                        <li>Onderhoudskosten per pand: ${formatBedrag(kostenPerPand)} per jaar</li>
-                                        <li>Hypotheeklasten per pand: ${formatBedrag(hypotheekLastenPerPand)} per jaar</li>
+                                        <li>Huurberekening: Vastgoedwaarde × Huurrendement ${jaar.jaar > 1 ? '× (1 + Huurstijging)^(jaar-1)' : ''}</li>
+                                        ${jaar.jaar > 1 ? 
+                                        `<li>Huurstijgingsfactor: ${(huurstijging * 100).toFixed(1)}% per jaar, cumulatief na ${jaar.jaar-1} jaar: ${(huurStijgingFactor * 100).toFixed(2)}%</li>` :
+                                        `<li>Huurstijging: In jaar 1 is er nog geen cumulatieve huurstijging</li>`}
+                                        <li>Huurinkomsten per pand: ${formatBedrag(pandwaarde)} × ${(huurrendement * 100).toFixed(1)}% ${jaar.jaar > 1 ? `× ${huurStijgingFactor.toFixed(4)}` : ''} = ${formatBedrag(huurPerPand)} per jaar</li>
+                                        <li>Onderhoudskosten per pand: ${formatBedrag(kostenPerPand)} per jaar (${(kostenPercentage * 100).toFixed(1)}% van pandwaarde)</li>
+                                        <li>Hypotheeklasten per pand: ${formatBedrag(hypotheekLastenPerPand)} per jaar (${(rentePercentage * 100).toFixed(1)}% rente over ${(ltv * 100).toFixed(0)}% LTV)</li>
                                         <li>Netto inkomen per pand: ${formatBedrag(nettoPerPand)} per jaar</li>
-                                        <li>Totaal netto inkomen: ${formatBedrag(jaar.nettoInkomen || 0)} per jaar</li>
-                                        <li>Minimaal benodigd inkomen: ${formatBedrag(jaar.jaar === 1 ? minimaalInkomen * 12 : minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar.jaar - 1) * 12)} per jaar</li>
+                                        <li>Totaal netto inkomen: ${formatBedrag(jaar.nettoInkomen || 0)} per jaar (${formatBedrag(jaar.nettoInkomen / 12)} per maand)</li>
+                                        <li>Minimaal benodigd inkomen: ${formatBedrag(minimaalInkomenDitJaar * 12)} per jaar (${formatBedrag(minimaalInkomenDitJaar)} per maand)</li>
                                         <li>Beschikbare cashflow: ${formatBedrag(jaar.cashflowDitJaar || 0)} per jaar</li>
                                         ${jaar.cashflowGebruiktVoorVastgoed > 0 ? `<li>Cashflow gebruikt voor vastgoed: ${formatBedrag(jaar.cashflowGebruiktVoorVastgoed)}</li>` : ''}
                                     </ul>

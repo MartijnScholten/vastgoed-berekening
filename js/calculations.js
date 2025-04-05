@@ -12,26 +12,26 @@ function berekenScenarioResultaten() {
     const rentePercentage = parseFloat(document.getElementById('rentePercentage')?.value || 3.5) / 100;
     const isHolding = document.getElementById('isHolding')?.checked || false;
     const aantalJaren = parseInt(document.getElementById('aantalJaren')?.value || 30);
-    
+
     // Bereken de resultaten voor 3 scenario's: pessimistisch, neutraal, optimistisch
     const scenarios = {
         pessimistisch: { waardestijging: 1, huurstijging: 2, kostenstijging: 3 },
         neutraal: { waardestijging: 2, huurstijging: 3, kostenstijging: 2 },
         optimistisch: { waardestijging: 3, huurstijging: 4, kostenstijging: 1 }
     };
-    
+
     // Bereken en update de resultaten voor elk scenario
     for (const [scenario, percentages] of Object.entries(scenarios)) {
         // Update de UI waarden met veilige null-checks
         const waardestijgingEl = document.getElementById(`${scenario}Waardestijging`);
         if (waardestijgingEl) waardestijgingEl.textContent = `${percentages.waardestijging}%`;
-        
+
         const huurstijgingEl = document.getElementById(`${scenario}Huurstijging`);
         if (huurstijgingEl) huurstijgingEl.textContent = `${percentages.huurstijging}%`;
-        
+
         const kostenstijgingEl = document.getElementById(`${scenario}Kostenstijging`);
         if (kostenstijgingEl) kostenstijgingEl.textContent = `${percentages.kostenstijging}%`;
-        
+
         // Bereken de resultaten gebaseerd op deze percentages
         const projectie = berekenProjectie(
             eigenVermogen,
@@ -49,24 +49,24 @@ function berekenScenarioResultaten() {
             20, // default laatste aankoopjaar
             0.07 // default huurrendement
         );
-        
+
         // Update de resultaten in de UI
         if (projectie.length > 0) {
             const laatsteJaar = projectie[projectie.length - 1];
             const pandenEl = document.getElementById(`${scenario}Panden`);
             if (pandenEl) pandenEl.textContent = laatsteJaar.aantalPanden;
-            
+
             const waardeEl = document.getElementById(`${scenario}Waarde`);
             if (waardeEl) waardeEl.textContent = formatBedrag(laatsteJaar.vastgoedwaarde);
-            
+
             const nettoInkomenEl = document.getElementById(`${scenario}NettoInkomen`);
             if (nettoInkomenEl) nettoInkomenEl.textContent = formatBedrag(laatsteJaar.nettoInkomen);
-            
+
             const totaalVermogenEl = document.getElementById(`${scenario}TotaalVermogen`);
             if (totaalVermogenEl) totaalVermogenEl.textContent = formatBedrag(laatsteJaar.eigenVermogen);
         }
     }
-    
+
     // Toon resultaten sectie
     const resultatenEl = document.getElementById('resultaten');
     if (resultatenEl) resultatenEl.classList.remove('hidden');
@@ -76,59 +76,59 @@ function berekenVermogensgroei() {
     // Haal waarden op uit het formulier met veilige verwijzingen
     const eigenVermogenEl = document.getElementById('startEigenVermogen');
     const eigenVermogen = eigenVermogenEl ? parseFloat(eigenVermogenEl.value) || 0 : 0;
-    
+
     const gemiddeldePandwaardeEl = document.getElementById('pandwaarde');
     const gemiddeldePandwaarde = gemiddeldePandwaardeEl ? parseFloat(gemiddeldePandwaardeEl.value) || 100000 : 100000;
-    
+
     const ltvEl = document.getElementById('ltvVermogensgroei');
     const ltv = ltvEl ? parseFloat(ltvEl.value || 70) / 100 : 0.7;
-    
+
     const rentePercentageEl = document.getElementById('rentePercentageVermogensgroei');
     const rentePercentage = rentePercentageEl ? parseFloat(rentePercentageEl.value || 3.5) / 100 : 0.035;
-    
+
     const isHoldingEl = document.getElementById('structuurVermogensgroei');
     const isHolding = isHoldingEl ? isHoldingEl.value === 'holding' : false;
-    
+
     const aantalJarenEl = document.getElementById('looptijdVermogensgroei');
     const aantalJaren = aantalJarenEl ? parseInt(aantalJarenEl.value || 30) : 30;
-    
+
     const waardestijgingEl = document.getElementById('waardestijgingVermogensgroei');
     const waardestijging = waardestijgingEl ? parseFloat(waardestijgingEl.value || 2) / 100 : 0.02;
-    
+
     const huurstijgingEl = document.getElementById('huurstijgingVermogensgroei');
     const huurstijging = huurstijgingEl ? parseFloat(huurstijgingEl.value || 3) / 100 : 0.03;
-    
-    const kostenstijgingEl = document.getElementById('kostenPercentageVermogensgroei');
-    const kostenstijging = kostenstijgingEl ? parseFloat(kostenstijgingEl.value || 2) / 100 : 0.02;
-    
+
+    const kostenPercentageEl = document.getElementById('kostenPercentageVermogensgroei');
+    const kostenPercentage = kostenPercentageEl ? parseFloat(kostenPercentageEl.value || 2) / 100 : 0.02;
+
     const aankoopfrequentieEl = document.getElementById('aankoopFrequentie');
     const aankoopfrequentie = aankoopfrequentieEl ? parseInt(aankoopfrequentieEl.value || 3) : 3;
-    
+
     // Update de aankoopfrequentie display in de uitleg
     const aankoopFrequentieDisplayEl = document.getElementById('aankoopFrequentieDisplay');
     if (aankoopFrequentieDisplayEl) {
         aankoopFrequentieDisplayEl.textContent = aankoopfrequentie;
     }
-    
+
     const extraJarenEl = document.getElementById('extraInlegJaren');
     const extraJaren = extraJarenEl ? parseInt(extraJarenEl.value || 0) : 0;
-    
+
     const extraBedragEl = document.getElementById('extraInlegBedrag');
     const extraBedrag = extraBedragEl ? parseFloat(extraBedragEl.value || 0) : 0;
-    
+
     const laatsteAankoopjaarEl = document.getElementById('laatsteAankoopJaar');
     const laatsteAankoopjaar = laatsteAankoopjaarEl ? parseInt(laatsteAankoopjaarEl.value || 30) : 30;
-    
+
     const minimaalInkomenEl = document.getElementById('minimaalInkomen');
     const minimaalInkomen = minimaalInkomenEl ? parseFloat(minimaalInkomenEl.value || 0) : 0;
-    
+
     const minimaalInkomenInflatieEl = document.getElementById('minimaalInkomenInflatie');
     const minimaalInkomenInflatie = minimaalInkomenInflatieEl ? parseFloat(minimaalInkomenInflatieEl.value || 0) / 100 : 0;
-    
+
     // Ook haalwaarde van huurrendement op
     const huurrendementEl = document.getElementById('huurrendementVermogensgroei');
     const huurrendement = huurrendementEl ? parseFloat(huurrendementEl.value || 7) / 100 : 0.07;
-    
+
     // Gebruik direct de berekenProjectie functie om alles consistent te houden
     const projectie = berekenProjectie(
         eigenVermogen,
@@ -139,7 +139,7 @@ function berekenVermogensgroei() {
         aantalJaren,
         waardestijging,
         huurstijging,
-        kostenstijging,
+        kostenPercentage,
         aankoopfrequentie,
         extraJaren,
         extraBedrag,
@@ -151,56 +151,56 @@ function berekenVermogensgroei() {
 
     // Maak de projectie globaal beschikbaar voor de PDF export
     window.huidigeProjectie = projectie;
-    
+
     // Update de UI met de resultaten
     updateVermogensgroeiTabel(projectie);
     updateVermogensgroeiGrafieken(projectie);
-    
+
     return projectie;
 }
 
 function updateVermogensgroeiUI(projectie) {
     const laatsteJaar = projectie[projectie.length - 1];
-    
+
     // Update samenvatting met veilige element-checks
     const totaleVastgoedwaardeEl = document.getElementById('totaleVastgoedwaardeVermogensgroei');
     if (totaleVastgoedwaardeEl) totaleVastgoedwaardeEl.textContent = formatBedrag(laatsteJaar.vastgoedwaarde);
-    
+
     const aantalWoningenEl = document.getElementById('aantalWoningenVermogensgroei');
     if (aantalWoningenEl) aantalWoningenEl.textContent = laatsteJaar.aantalPanden;
-    
+
     const eigenVermogenEl = document.getElementById('eigenVermogenVermogensgroei');
     if (eigenVermogenEl) eigenVermogenEl.textContent = formatBedrag(laatsteJaar.eigenVermogen);
-    
+
     // Bereken en update inkomen
     const initieelNettoInkomen = projectie[1].nettoInkomen;
     const laatsteNettoInkomen = laatsteJaar.nettoInkomen;
-    
+
     const initieelNettoInkomenEl = document.getElementById('initieelNettoInkomen');
     if (initieelNettoInkomenEl) initieelNettoInkomenEl.textContent = formatBedrag(initieelNettoInkomen);
-    
+
     const eindNettoInkomenEl = document.getElementById('eindNettoInkomen');
     if (eindNettoInkomenEl) eindNettoInkomenEl.textContent = formatBedrag(laatsteNettoInkomen);
-    
+
     // Bereken break-even punt (wanneer netto inkomen >= aanvankelijke investering / 12)
     const eigenVermogenInputEl = document.getElementById('eigenVermogen');
     const eigenVermogen = eigenVermogenInputEl ? parseFloat(eigenVermogenInputEl.value || 0) : 0;
     const breakEvenJaar = projectie.findIndex(p => p.nettoInkomen >= eigenVermogen / 12);
-    
+
     const breakEvenPuntEl = document.getElementById('breakEvenPunt');
     if (breakEvenPuntEl) breakEvenPuntEl.textContent = breakEvenJaar !== -1 ? breakEvenJaar : 'N/A';
-    
+
     // Bereken rendement per €100k geïnvesteerd
     const rendementPer100k = (laatsteJaar.eigenVermogen / eigenVermogen) * 100000;
-    
+
     const rendementPer100kEl = document.getElementById('rendementPer100k');
     if (rendementPer100kEl) rendementPer100kEl.textContent = formatBedrag(rendementPer100k);
-    
+
     // Update comfort levels
     const minimaalInkomenEl = document.getElementById('minimaalInkomen');
     const minimaalInkomenValue = minimaalInkomenEl ? parseFloat(minimaalInkomenEl.value || 0) : 0;
     const passiefInkomenRatio = laatsteNettoInkomen / minimaalInkomenValue;
-    
+
     const comfortEl = document.getElementById('comfortLevel');
     if (comfortEl) {
         if (passiefInkomenRatio >= 3) {
@@ -223,11 +223,11 @@ function updateVermogensgroeiUI(projectie) {
             comfortEl.className = 'text-red-500 font-bold';
         }
     }
-    
+
     // Update tabellen en grafieken
     updateVermogensgroeiTabel(projectie);
     updateVermogensgroeiGrafieken(projectie);
-    
+
     // Toon de grafieken sectie
     const chartsSection = document.getElementById('charts');
     if (chartsSection) {
@@ -235,21 +235,21 @@ function updateVermogensgroeiUI(projectie) {
     }
 }
 
-        function formatBedrag(bedrag) {
-            return new Intl.NumberFormat('nl-NL', { 
-                style: 'currency', 
-                currency: 'EUR',
-                minimumFractionDigits: 0,
-                maximumFractionDigits: 0
-            }).format(bedrag);
-        }
+function formatBedrag(bedrag) {
+    return new Intl.NumberFormat('nl-NL', {
+        style: 'currency',
+        currency: 'EUR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+    }).format(bedrag);
+}
 
-        function updateVermogensgroeiTabel(projectie) {
+function updateVermogensgroeiTabel(projectie) {
     const tabelBody = document.getElementById('vermogensgroeiTabel');
     if (!tabelBody) return; // Stop als het element niet bestaat
-    
+
     tabelBody.innerHTML = '';
-    
+
     // Update de tabel headers (thead) om de nieuwe kolom toe te voegen
     const tabelHeader = document.querySelector('#vermogensgroeiTabel-header');
     if (tabelHeader) {
@@ -272,26 +272,42 @@ function updateVermogensgroeiUI(projectie) {
     // Haal minimaal inkomen op voor berekeningen
     const minimaalInkomenEl = document.getElementById('minimaalInkomen');
     const minimaalInkomen = minimaalInkomenEl ? parseFloat(minimaalInkomenEl.value || 0) : 0;
-    
+
     const minimaalInkomenInflatieEl = document.getElementById('minimaalInkomenInflatie');
     const minimaalInkomenInflatie = minimaalInkomenInflatieEl ? parseFloat(minimaalInkomenInflatieEl.value || 0) / 100 : 0;
+
+    // Haal ook andere parameters op voor de tooltips
+    const huurrendementEl = document.getElementById('huurrendementVermogensgroei');
+    const huurrendement = huurrendementEl ? parseFloat(huurrendementEl.value || 0) / 100 : 0.07;
     
+    const huurstijgingEl = document.getElementById('huurstijgingVermogensgroei');
+    const huurstijging = huurstijgingEl ? parseFloat(huurstijgingEl.value || 0) / 100 : 0;
+    
+    const kostenPercentageEl = document.getElementById('kostenPercentageVermogensgroei');
+    const kostenPercentage = kostenPercentageEl ? parseFloat(kostenPercentageEl.value || 0) / 100 : 0;
+    
+    const rentePercentageEl = document.getElementById('rentePercentageVermogensgroei');
+    const rentePercentage = rentePercentageEl ? parseFloat(rentePercentageEl.value || 0) / 100 : 0;
+    
+    const waardestijgingEl = document.getElementById('waardestijgingVermogensgroei');
+    const waardestijging = waardestijgingEl ? parseFloat(waardestijgingEl.value || 0) / 100 : 0;
+
     projectie.forEach((jaar, index) => {
         // Nieuw table row element aanmaken
-                const row = document.createElement('tr');
-        
+        const row = document.createElement('tr');
+
         // Voeg de highlight-row class toe aan elke derde rij (maar niet START)
         if (jaar.jaar !== "START" && jaar.jaar % 3 === 0) {
             row.classList.add('highlight-row');
         }
-        
+
         // Bereken het 'echte' eigen vermogen (zonder niet-gebruikte inleg)
         // Dit is vastgoedwaarde - hypotheek
         const eigenInVastgoed = jaar.vastgoedwaarde - jaar.hypotheek;
-        
+
         // Voor STARTpunt speciale weergave (alleen vastgoedwaarde en eigen vermogen)
         if (jaar.jaar === "START") {
-                row.innerHTML = `
+            row.innerHTML = `
                 <td>${jaar.jaar}</td>
                 <td>
                     <span title="Startkapitaal: Het initiële eigen vermogen dat je investeert">
@@ -299,12 +315,12 @@ function updateVermogensgroeiUI(projectie) {
                     </span>
                 </td>
                 <td>
-                    <span title="Formule: Aantal panden × Gemiddelde pandwaarde\n= ${jaar.aantalPanden || 0} × ${formatBedrag(jaar.vastgoedwaarde/(jaar.aantalPanden || 1))}\n= ${formatBedrag(jaar.vastgoedwaarde || 0)}">
+                    <span title="Formule: Aantal panden × Gemiddelde pandwaarde\n= ${jaar.aantalPanden || 0} × ${formatBedrag(jaar.vastgoedwaarde / (jaar.aantalPanden || 1))}\n= ${formatBedrag(jaar.vastgoedwaarde || 0)}">
                         ${formatBedrag(jaar.vastgoedwaarde || 0)} (${formatBedrag(jaar.eigenVermogen || 0)})
                     </span>
                 </td>
                 <td>
-                    <span title="Formule: Vastgoedwaarde × LTV%\n= ${formatBedrag(jaar.vastgoedwaarde || 0)} × ${(jaar.hypotheek/jaar.vastgoedwaarde*100).toFixed(0)}%\n= ${formatBedrag(jaar.hypotheek || 0)}">
+                    <span title="Formule: Vastgoedwaarde × LTV%\n= ${formatBedrag(jaar.vastgoedwaarde || 0)} × ${(jaar.hypotheek / jaar.vastgoedwaarde * 100).toFixed(0)}%\n= ${formatBedrag(jaar.hypotheek || 0)}">
                         ${formatBedrag(jaar.hypotheek || 0)}
                     </span>
                 </td>
@@ -331,13 +347,13 @@ function updateVermogensgroeiUI(projectie) {
             `;
         } else {
             // Bereken minimaal inkomen voor dit jaar (met inflatie)
-            const minimaalInkomenDitJaar = jaar.jaar === 1 ? 
-                minimaalInkomen : 
+            const minimaalInkomenDitJaar = jaar.jaar === 1 ?
+                minimaalInkomen :
                 minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar.jaar - 1);
-                
+
             // Toon nettoInkomen per maand
             const nettoInkomenPerMaand = jaar.nettoInkomen ? Math.round(jaar.nettoInkomen / 12) : 0;
-            
+
             // Bereken vermogensgroei
             let vermogensgroei = 0;
             if (index === 1) {
@@ -347,10 +363,10 @@ function updateVermogensgroeiUI(projectie) {
                 // Voor latere jaren, neem verschil in eigenVermogen en corrigeer voor extra inleg
                 vermogensgroei = jaar.eigenVermogen - projectie[index - 1].eigenVermogen - jaar.inleg;
             }
-            
+
             // Bereken jaarlijks minimaal inkomen
             const jaarlijksMinimaalInkomen = minimaalInkomenDitJaar * 12;
-            
+
             row.innerHTML = `
                 <td>${jaar.jaar}</td>
                 <td>
@@ -374,7 +390,7 @@ function updateVermogensgroeiUI(projectie) {
                     </span>
                 </td>
                 <td>
-                    <span title="Formule: (Huur - Kosten - Hypotheekrente) / 12 maanden\nHuur: ${formatBedrag(jaar.vastgoedwaarde * 0.07 * Math.pow(1 + 0.03, jaar.jaar - 1) || 0)}\nKosten: ${formatBedrag(jaar.vastgoedwaarde * 0.02 || 0)}\nRente: ${formatBedrag(jaar.hypotheek * 0.035 || 0)}\nJaarlijks: ${formatBedrag(jaar.nettoInkomen || 0)}\nMaandelijks: ${formatBedrag(nettoInkomenPerMaand || 0)}\n\nMinimaal benodigde inkomen (maandelijks): ${formatBedrag(minimaalInkomenDitJaar)}">
+                    <span title="Formule: (Huur - Kosten - Hypotheekrente) / 12 maanden\n\nHuurberekening: Vastgoedwaarde × Huurrendement ${jaar.jaar > 1 ? `× (1 + Huurstijging)^(jaar-1)` : ``}\n= ${formatBedrag(jaar.vastgoedwaarde || 0)} × ${(huurrendement * 100).toFixed(1)}% ${jaar.jaar > 1 ? `× ${Math.pow(1 + huurstijging, jaar.jaar - 1).toFixed(4)}` : ``}\n= ${formatBedrag(jaar.vastgoedwaarde * huurrendement * (jaar.jaar > 1 ? Math.pow(1 + huurstijging, jaar.jaar - 1) : 1) || 0)} per jaar\n\nOnderhoudskosten: ${formatBedrag(jaar.vastgoedwaarde * kostenPercentage || 0)} (${(kostenPercentage * 100).toFixed(1)}%)\nHypotheeklast: ${formatBedrag(jaar.hypotheek * rentePercentage || 0)} (${(rentePercentage * 100).toFixed(1)}%)\n\nNetto inkomen per jaar: ${formatBedrag(jaar.nettoInkomen || 0)}\nNetto inkomen per maand: ${formatBedrag(nettoInkomenPerMaand || 0)}\n\nMinimaal benodigde inkomen (maandelijks): ${formatBedrag(minimaalInkomenDitJaar)}">
                         ${jaar.nettoInkomen ? formatBedrag(nettoInkomenPerMaand) + ' / ' + formatBedrag(minimaalInkomenDitJaar) : '-'}
                     </span>
                 </td>
@@ -384,197 +400,192 @@ function updateVermogensgroeiUI(projectie) {
                     </span>
                 </td>
                 <td>
-                    <span title="${jaar.eigenVermogen ? 
-                        `Formule: Vastgoedwaarde - Hypotheek + Niet-gebruikte cashflow + Niet-geïnvesteerde extra inleg\n\nVastgoedwaarde: ${formatBedrag(jaar.vastgoedwaarde || 0)}\nMin Hypotheek: ${formatBedrag(jaar.hypotheek || 0)}\nEigen in vastgoed: ${formatBedrag(jaar.vastgoedwaarde - jaar.hypotheek || 0)}${
-                            jaar.cumulatieveExtraInleg > 0 ? 
-                            `\nPlus Nog niet geïnvesteerde extra inleg: ${formatBedrag(jaar.cumulatieveExtraInleg)}` : 
-                            ''
-                        }${
-                            jaar.nietGebruikteCashflow > 0 ? 
-                            `\nPlus Niet gebruikte cashflow: ${formatBedrag(jaar.nietGebruikteCashflow)}` : 
-                            ''
-                        }${
-                            (index > 1 && projectie.slice(1, index).some(j => j.cashflowGebruiktVoorVastgoed > 0)) ?
-                            `\n\nTotaal cashflow gebruikt voor vastgoed: ${formatBedrag(projectie.slice(1, index + 1).reduce((sum, j) => sum + (j.cashflowGebruiktVoorVastgoed || 0), 0))}` :
-                            ''
-                        }\n= ${formatBedrag(jaar.eigenVermogen || 0)}\n\nLET OP: Bij aankoopmomenten worden beschikbare fondsen (overwaarde, cashflow en extra inleg) gebruikt om nieuwe panden te kopen. Deze worden dan omgezet in vastgoed en verhogen de waarde van 'Eigen in vastgoed'.` : 
-                        'Startkapitaal'
-                    }">
+                    <span title="${jaar.eigenVermogen ?
+                    `Formule: Vastgoedwaarde - Hypotheek + Niet-gebruikte cashflow + Niet-geïnvesteerde extra inleg\n\nVastgoedwaarde: ${formatBedrag(jaar.vastgoedwaarde || 0)}\nMin Hypotheek: ${formatBedrag(jaar.hypotheek || 0)}\nEigen in vastgoed: ${formatBedrag(jaar.vastgoedwaarde - jaar.hypotheek || 0)}${jaar.cumulatieveExtraInleg > 0 ?
+                        `\nPlus Nog niet geïnvesteerde extra inleg: ${formatBedrag(jaar.cumulatieveExtraInleg)}` :
+                        ''
+                    }${jaar.nietGebruikteCashflow > 0 ?
+                        `\nPlus Niet gebruikte cashflow: ${formatBedrag(jaar.nietGebruikteCashflow)}` :
+                        ''
+                    }${(index > 1 && projectie.slice(1, index).some(j => j.cashflowGebruiktVoorVastgoed > 0)) ?
+                        `\n\nTotaal cashflow gebruikt voor vastgoed: ${formatBedrag(projectie.slice(1, index + 1).reduce((sum, j) => sum + (j.cashflowGebruiktVoorVastgoed || 0), 0))}` :
+                        ''
+                    }\n= ${formatBedrag(jaar.eigenVermogen || 0)}\n\nLET OP: Bij aankoopmomenten worden beschikbare fondsen (overwaarde, cashflow en extra inleg) gebruikt om nieuwe panden te kopen. Deze worden dan omgezet in vastgoed en verhogen de waarde van 'Eigen in vastgoed'.` :
+                    'Startkapitaal'
+                }">
                         ${formatBedrag(jaar.eigenVermogen || 0)}
                     </span>
                 </td>
                 <td>
-                    <span title="${index > 1 ? 
-                        `Formule: Eigen vermogen nu - Eigen vermogen vorig jaar - Extra inleg\n= ${formatBedrag(jaar.eigenVermogen || 0)} - ${formatBedrag(projectie[index - 1].eigenVermogen || 0)} - ${formatBedrag(jaar.inleg || 0)}\n= ${formatBedrag(vermogensgroei)}` : 
-                        `In jaar 1 is de vermogensgroei gelijk aan de overwaarde: ${formatBedrag(jaar.overwaarde || 0)}`}">
+                    <span title="${index > 1 ?
+                    `Formule: Eigen vermogen nu - Eigen vermogen vorig jaar - Extra inleg\n= ${formatBedrag(jaar.eigenVermogen || 0)} - ${formatBedrag(projectie[index - 1].eigenVermogen || 0)} - ${formatBedrag(jaar.inleg || 0)}\n= ${formatBedrag(vermogensgroei)}` :
+                    `In jaar 1 is de vermogensgroei gelijk aan de overwaarde: ${formatBedrag(jaar.overwaarde || 0)}`}">
                         ${formatBedrag(vermogensgroei)}
                     </span>
                 </td>
                 <td>
-                    <span title="Formule: Netto inkomen - Minimaal inkomen (voor dit jaar)\n\nNetto inkomen (jaarlijks): ${formatBedrag(jaar.nettoInkomen || 0)}\nMinimaal inkomen (jaarlijks): ${formatBedrag(jaarlijksMinimaalInkomen)}\nVerschil dit jaar: ${formatBedrag(jaar.cashflowDitJaar || 0)}${
-                        jaar.cashflowGebruiktVoorVastgoed > 0 ? 
-                        `\n\nHiervan gebruikt voor aankoop vastgoed: ${formatBedrag(jaar.cashflowGebruiktVoorVastgoed || 0)}` : 
-                        ''
-                    }${
-                        (index > 1 && projectie.slice(1, index).some(j => j.cashflowGebruiktVoorVastgoed > 0)) ?
-                        `\n\nTotaal gebruikt voor vastgoed (cumulatief): ${formatBedrag(projectie.slice(1, index + 1).reduce((sum, j) => sum + (j.cashflowGebruiktVoorVastgoed || 0), 0))}` :
-                        ''
-                    }">
+                    <span title="Formule: Netto inkomen - Minimaal inkomen (voor dit jaar)\n\nNetto inkomen (jaarlijks): ${formatBedrag(jaar.nettoInkomen || 0)}\nMinimaal inkomen (jaarlijks): ${formatBedrag(jaarlijksMinimaalInkomen)}\nVerschil dit jaar: ${formatBedrag(jaar.cashflowDitJaar || 0)}${jaar.cashflowGebruiktVoorVastgoed > 0 ?
+                    `\n\nHiervan gebruikt voor aankoop vastgoed: ${formatBedrag(jaar.cashflowGebruiktVoorVastgoed || 0)}` :
+                    ''
+                }${(index > 1 && projectie.slice(1, index).some(j => j.cashflowGebruiktVoorVastgoed > 0)) ?
+                    `\n\nTotaal gebruikt voor vastgoed (cumulatief): ${formatBedrag(projectie.slice(1, index + 1).reduce((sum, j) => sum + (j.cashflowGebruiktVoorVastgoed || 0), 0))}` :
+                    ''
+                }">
                         ${jaar.cashflowDitJaar ? formatBedrag(jaar.cashflowDitJaar) : '-'}
                     </span>
                 </td>
                 <td>
-                    <span title="Formule: (Netto inkomen / Eigen vermogen vorig jaar) × 100%\n= (${formatBedrag(jaar.nettoInkomen || 0)} / ${formatBedrag(projectie[index-1].eigenVermogen || 1)}) × 100%\n= ${jaar.roe ? jaar.roe.toFixed(1) : 0}%">
+                    <span title="Formule: (Netto inkomen / Eigen vermogen vorig jaar) × 100%\n= (${formatBedrag(jaar.nettoInkomen || 0)} / ${formatBedrag(projectie[index - 1].eigenVermogen || 1)}) × 100%\n= ${jaar.roe ? jaar.roe.toFixed(1) : 0}%">
                         ${jaar.roe ? `${jaar.roe.toFixed(1)}%` : '-'}
                     </span>
                 </td>
                 <td>
-                    <span title="Formule: ROE + Waardestijging %\n= ${jaar.roe ? jaar.roe.toFixed(1) : 0}% + ${(waardestijging*100).toFixed(1)}%\n= ${jaar.totaalRendement ? jaar.totaalRendement.toFixed(1) : 0}%">
+                    <span title="Formule: ROE + Waardestijging %\n= ${jaar.roe ? jaar.roe.toFixed(1) : 0}% + ${(waardestijging * 100).toFixed(1)}%\n= ${jaar.totaalRendement ? jaar.totaalRendement.toFixed(1) : 0}%">
                         ${jaar.totaalRendement ? `${jaar.totaalRendement.toFixed(1)}%` : '-'}
                     </span>
                 </td>
             `;
         }
-        
+
         tabelBody.appendChild(row);
     });
-    
+
     // Toon de tabel sectie
     const tabelSection = document.getElementById('tabelSection');
     if (tabelSection) {
         tabelSection.classList.remove('hidden');
     }
-        }
+}
 
-        function updateVermogensgroeiGrafieken(projectie) {
+function updateVermogensgroeiGrafieken(projectie) {
     const minimaalInkomenEl = document.getElementById('minimaalInkomen');
     const minimaalInkomen = minimaalInkomenEl ? parseFloat(minimaalInkomenEl.value || 0) : 0;
-    
+
     const minimaalInkomenInflatieEl = document.getElementById('minimaalInkomenInflatie');
     const minimaalInkomenInflatie = minimaalInkomenInflatieEl ? parseFloat(minimaalInkomenInflatieEl.value || 0) / 100 : 0;
 
-            // Update vermogensgroei grafiek
-            if (vermogensgroeiChart) {
-                vermogensgroeiChart.destroy();
-            }
+    // Update vermogensgroei grafiek
+    if (vermogensgroeiChart) {
+        vermogensgroeiChart.destroy();
+    }
 
     const vermogensgroeiCtx = document.getElementById('vermogensgroeiChart');
     if (!vermogensgroeiCtx) return; // Als het element niet bestaat, stop dan
-    
+
     const ctx = vermogensgroeiCtx.getContext('2d');
     if (!ctx) return; // Als de context niet kan worden opgehaald, stop dan
-    
+
     vermogensgroeiChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: projectie.map(p => p.jaar),
-                    datasets: [
-                        {
-                            label: 'Eigen Vermogen',
-                            data: projectie.map(p => p.eigenVermogen),
-                            borderColor: '#3182ce',
-                            backgroundColor: 'rgba(49, 130, 206, 0.1)',
-                            fill: true
-                        },
-                        {
-                            label: 'Vastgoedwaarde',
-                            data: projectie.map(p => p.vastgoedwaarde),
-                            borderColor: '#48bb78',
-                            backgroundColor: 'rgba(72, 187, 120, 0.1)',
-                            fill: true
-                        }
-                    ]
+        type: 'line',
+        data: {
+            labels: projectie.map(p => p.jaar),
+            datasets: [
+                {
+                    label: 'Eigen Vermogen',
+                    data: projectie.map(p => p.eigenVermogen),
+                    borderColor: '#3182ce',
+                    backgroundColor: 'rgba(49, 130, 206, 0.1)',
+                    fill: true
                 },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return formatBedrag(value);
-                                }
-                            }
-                        }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${formatBedrag(context.raw)}`;
-                                }
-                            }
+                {
+                    label: 'Vastgoedwaarde',
+                    data: projectie.map(p => p.vastgoedwaarde),
+                    borderColor: '#48bb78',
+                    backgroundColor: 'rgba(72, 187, 120, 0.1)',
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function (value) {
+                            return formatBedrag(value);
                         }
                     }
                 }
-            });
-
-            // Update inkomen grafiek
-            if (inkomenChart) {
-                inkomenChart.destroy();
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.dataset.label}: ${formatBedrag(context.raw)}`;
+                        }
+                    }
+                }
             }
+        }
+    });
+
+    // Update inkomen grafiek
+    if (inkomenChart) {
+        inkomenChart.destroy();
+    }
 
     const inkomenCtx = document.getElementById('inkomenChart');
     if (!inkomenCtx) return; // Als het element niet bestaat, stop dan
-    
+
     const inkomenContext = inkomenCtx.getContext('2d');
     if (!inkomenContext) return; // Als de context niet kan worden opgehaald, stop dan
-    
+
     inkomenChart = new Chart(inkomenContext, {
-                type: 'line',
-                data: {
-                    labels: projectie.map(p => p.jaar),
-                    datasets: [
-                        {
-                            label: 'Netto Inkomen per Maand',
+        type: 'line',
+        data: {
+            labels: projectie.map(p => p.jaar),
+            datasets: [
+                {
+                    label: 'Netto Inkomen per Maand',
                     data: projectie.map(p => p.nettoInkomen ? p.nettoInkomen / 12 : null),
-                            borderColor: '#f6ad55',
-                            backgroundColor: 'rgba(246, 173, 85, 0.1)',
-                            fill: true
-                        },
-                        {
-                            label: 'Minimaal Inkomen',
+                    borderColor: '#f6ad55',
+                    backgroundColor: 'rgba(246, 173, 85, 0.1)',
+                    fill: true
+                },
+                {
+                    label: 'Minimaal Inkomen',
                     data: projectie.map(p => {
                         if (p.jaar === "START") return null;
                         return minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, typeof p.jaar === 'number' ? p.jaar - 1 : 0);
                     }),
-                            borderColor: '#e53e3e',
-                            backgroundColor: 'rgba(229, 62, 62, 0.1)',
-                            fill: true,
-                            borderDash: [5, 5]
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Netto Inkomen per Maand (€)'
-                            },
-                            ticks: {
-                                callback: function(value) {
-                                    return formatBedrag(value);
-                                }
-                            }
-                        }
+                    borderColor: '#e53e3e',
+                    backgroundColor: 'rgba(229, 62, 62, 0.1)',
+                    fill: true,
+                    borderDash: [5, 5]
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Netto Inkomen per Maand (€)'
                     },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return `${context.dataset.label}: ${formatBedrag(context.raw)}`;
-                                }
-                            }
+                    ticks: {
+                        callback: function (value) {
+                            return formatBedrag(value);
                         }
                     }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function (context) {
+                            return `${context.dataset.label}: ${formatBedrag(context.raw)}`;
+                        }
                     }
-                });
+                }
             }
+        }
+    });
+}
 
 function eigenVermogenTooltip(eigenVermogen, vorigEigenVermogen, overwaarde, nettoInkomen, cumulatieveExtraInleg, nietGebruikteCashflow, aankoopKosten) {
     const eigenVermogenTooltip = `
@@ -591,7 +602,7 @@ function eigenVermogenTooltip(eigenVermogen, vorigEigenVermogen, overwaarde, net
 }
 
 function formatNumberWithPoints(bedrag) {
-    return new Intl.NumberFormat('nl-NL', { 
+    return new Intl.NumberFormat('nl-NL', {
         minimumFractionDigits: 0,
         maximumFractionDigits: 0
     }).format(bedrag);
@@ -606,7 +617,7 @@ function berekenProjectie(
     aantalJaren,
     waardestijging,
     huurstijging,
-    kostenstijging,
+    kostenPercentage,
     aankoopfrequentie = 3,
     extraJaren = 0,
     extraBedrag = 0,
@@ -618,7 +629,7 @@ function berekenProjectie(
     // Bereken initiële waardes op basis van eigenVermogen en pandwaarde
     const pandInitieleAankoop = Math.floor(startEigenVermogen / (gemiddeldePandwaarde * (1 - ltv)));
     const aantalStartPanden = pandInitieleAankoop > 0 ? pandInitieleAankoop : 1;
-    
+
     // Log de berekening van het aantal startpanden
     console.log("ProjectieBerekening - Initiële berekening:", {
         startEigenVermogen,
@@ -628,21 +639,21 @@ function berekenProjectie(
         pandInitieleAankoop,
         aantalStartPanden
     });
-    
+
     let huidigeVastgoedwaarde = aantalStartPanden * gemiddeldePandwaarde;
     let huidigeHuur = huidigeVastgoedwaarde * huurrendement;
-    let huidigeKosten = huidigeVastgoedwaarde * kostenstijging;
+    let huidigeKosten = huidigeVastgoedwaarde * kostenPercentage;
     let huidigHypotheek = huidigeVastgoedwaarde * ltv;
     let huidigeRente = huidigHypotheek * rentePercentage;
     let huidigEigenVermogen = huidigeVastgoedwaarde - huidigHypotheek;
     let huidigAantalPanden = aantalStartPanden;
-    
+
     // Eventueel resterend eigen vermogen wat niet is geïnvesteerd
     let resterendEigenVermogen = startEigenVermogen - huidigEigenVermogen;
     if (resterendEigenVermogen > 0) {
         huidigEigenVermogen += resterendEigenVermogen;
     }
-    
+
     // Log de berekende initiële waarden
     console.log("ProjectieBerekening - Initiële waarden:", {
         huidigeVastgoedwaarde,
@@ -652,14 +663,14 @@ function berekenProjectie(
         resterendEigenVermogen,
         "aantalPanden": huidigAantalPanden
     });
-    
+
     let huidigNietGebruikteCashflow = 0;
     let cumulatieveOverwaarde = 0;
     let cumulatieveExtraInleg = 0;
 
     // Array om resultaten in op te slaan
     const projectie = [];
-    
+
     // Voeg START toe als eerste jaar
     projectie.push({
         jaar: "START",
@@ -676,20 +687,20 @@ function berekenProjectie(
 
     // Bereken netto inkomen voor jaar 1
     const huur = huidigeVastgoedwaarde * huurrendement;
-    const kosten = huidigeVastgoedwaarde * kostenstijging;
+    const kosten = huidigeVastgoedwaarde * kostenPercentage;
     const rente = huidigHypotheek * rentePercentage;
     const effectiefNettoInkomen = Math.round(huur - kosten - rente);
-    
+
     // Bereken waardestijging voor jaar 1
     const waardestijgingBedrag = Math.round(huidigeVastgoedwaarde * waardestijging);
-    
+
     // Verhoog vastgoedwaarde met waardestijging
     huidigeVastgoedwaarde += waardestijgingBedrag;
     cumulatieveOverwaarde += waardestijgingBedrag;
-    
+
     // Bepaal het minimaal inkomen voor jaar 1
     const minimaalInkomenJaar1 = minimaalInkomen * 12; // Jaarlijks minimaal inkomen
-    
+
     // Alleen overschot aan inkomen toevoegen aan niet-gebruikte cashflow als het boven het minimale inkomen ligt
     let cashflowDitJaar = 0;
     if (effectiefNettoInkomen > minimaalInkomenJaar1) {
@@ -700,27 +711,27 @@ function berekenProjectie(
     } else {
         console.log(`Jaar 1: Netto inkomen €${formatNumberWithPoints(effectiefNettoInkomen)} is niet hoger dan minimaal inkomen €${formatNumberWithPoints(minimaalInkomenJaar1)}, niets toegevoegd`);
     }
-    
+
     // Extra inleg voor dit jaar - wordt aan het EINDE van jaar 1 toegevoegd
     let extraInlegDitJaar = 0;
     if (extraJaren >= 1) {
         extraInlegDitJaar = extraBedrag;
     }
-    
+
     cumulatieveExtraInleg += extraInlegDitJaar;
-    
+
     // Bereken eigen vermogen: vastgoedwaarde - hypotheek + niet-gebruikte cashflow + extra inleg
     // De hypotheek blijft ongewijzigd door extra inleg, die wordt alleen gebruikt voor nieuwe panden
     huidigEigenVermogen = huidigeVastgoedwaarde - huidigHypotheek + huidigNietGebruikteCashflow + cumulatieveExtraInleg;
-    
+
     // ROE berekenen (Return on Equity)
     // Gebruik het eigen vermogen van START
     const vorigEigenVermogen = projectie[0].eigenVermogen;
     const roe = Math.round((effectiefNettoInkomen / vorigEigenVermogen) * 100 * 10) / 10;
-    
+
     // Totaal rendement berekenen (ROE + waardestijging %)
     const totaalRendement = Math.round((roe + waardestijging * 100) * 10) / 10;
-    
+
     // Voeg resultaten toe voor jaar 1
     projectie.push({
         jaar: 1,
@@ -741,25 +752,35 @@ function berekenProjectie(
 
     // Bereken voor jaar 2 en verder
     for (let jaar = 2; jaar <= aantalJaren; jaar++) {
-        // Update waardes met inflatie
-        const waardestijgingBedrag = Math.round(huidigeVastgoedwaarde * waardestijging);
-        
         // Bereken nieuwe huurinkomsten met huurstijging
         const huur = huidigeVastgoedwaarde * huurrendement * Math.pow(1 + huurstijging, jaar - 1);
-        const kosten = huidigeVastgoedwaarde * kostenstijging;
+        const kosten = huidigeVastgoedwaarde * kostenPercentage;
         const rente = huidigHypotheek * rentePercentage;
         const jaarNettoInkomen = Math.round(huur - kosten - rente);
         
+        // Log gedetailleerde berekening van huur en netto inkomen
+        console.log(`Jaar ${jaar} - Gedetailleerde huurberekening:`, {
+            "Vastgoedwaarde": formatBedrag(huidigeVastgoedwaarde),
+            "Huurrendement (basis)": (huurrendement * 100).toFixed(1) + "%",
+            "Huurstijging factor": `${(huurstijging * 100).toFixed(1)}% per jaar, cumulatief: ${(Math.pow(1 + huurstijging, jaar - 1) * 100).toFixed(2)}%`,
+            "Formule": `Vastgoedwaarde × Huurrendement × (1 + Huurstijging)^(jaar-1)`,
+            "Berekening": `${formatBedrag(huidigeVastgoedwaarde)} × ${(huurrendement * 100).toFixed(1)}% × ${Math.pow(1 + huurstijging, jaar - 1).toFixed(4)} = ${formatBedrag(huur)}`,
+            "Huur totaal": formatBedrag(huur),
+            "Onderhoudskosten": formatBedrag(kosten),
+            "Hypotheekrente": formatBedrag(rente),
+            "Netto inkomen": formatBedrag(jaarNettoInkomen)
+        });
+
         // Verhoog vastgoedwaarde met waardestijging
         huidigeVastgoedwaarde += waardestijgingBedrag;
-        
+
         // Update cumulatieven
         cumulatieveOverwaarde += waardestijgingBedrag;
-        
+
         // Bepaal het minimaal inkomen voor dit jaar (met inflatie)
         const minimaalInkomenDitJaar = minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar - 1);
         const minimaalInkomenJaar = minimaalInkomenDitJaar * 12; // Jaarlijks minimaal inkomen
-        
+
         // Alleen overschot aan inkomen toevoegen aan niet-gebruikte cashflow als het boven het minimale inkomen ligt
         let cashflowDitJaar = 0;
         if (jaarNettoInkomen > minimaalInkomenJaar) {
@@ -770,24 +791,24 @@ function berekenProjectie(
         } else {
             console.log(`Jaar ${jaar}: Netto inkomen €${formatNumberWithPoints(jaarNettoInkomen)} is niet hoger dan minimaal inkomen €${formatNumberWithPoints(minimaalInkomenJaar)}, niets toegevoegd`);
         }
-        
+
         // Beginnend bij jaar 1, niet bij START (dus jaar - 1)
         const maandenSindsStart = (jaar - 1) * 12;
         const isAankoopMoment = maandenSindsStart % aankoopfrequentie === 0 && maandenSindsStart > 0;
-        
+
         let nieuweHuur = huur;
         let nieuweKosten = kosten;
         let nieuweRente = rente;
         let nieuwNettoInkomen = jaarNettoInkomen;
         let aankoopbedrag = 0;
-        
+
         // Variabele om bij te houden hoeveel cashflow wordt gebruikt voor vastgoed
         let cashflowGebruiktVoorVastgoed = 0;
-        
+
         // Hier nemen we de cumulatieve extra inleg mee als beschikbaar kapitaal
         const beschikbaarVoorInvestering = huidigNietGebruikteCashflow + cumulatieveOverwaarde + cumulatieveExtraInleg;
         const benodigdEigenVermogenPerPand = gemiddeldePandwaarde * (1 - ltv);
-        
+
         // ====== AANKOOP REGELS ======
         //
         // 1. REGULIERE AANKOPEN:
@@ -814,18 +835,18 @@ function berekenProjectie(
         //    - Na het 'laatsteAankoopjaar' worden geen nieuwe panden meer gekocht
         //    - Overwaarde blijft in het vastgoed zitten en wordt beschouwd als "eigen in vastgoed"
         //    - Niet-gebruikte cashflow (verschil tussen netto inkomen en minimaal inkomen) blijft beschikbaar
-        
+
         // Bepaal of we het gebruik van extra inleg moeten forceren (als we voorbij de extra inleg jaren zijn
         // maar nog steeds cumulatieve extra inleg over hebben)
         let forceerGebruikExtraInleg = false;
-        
+
         // Forceer investeringen als:
         // 1. We voorbij de extra inleg jaren zijn en nog steeds cumulatieve extra inleg hebben
         // 2. OF er genoeg beschikbaar kapitaal is voor minimaal 1 pand + 25% extra buffer
         // EN we zijn niet voorbij het laatste aankoopjaar
         const kanNogKopen = jaar <= laatsteAankoopjaar;
         const heeftGenoegVoorPand = beschikbaarVoorInvestering >= benodigdEigenVermogenPerPand * 1.25;
-        
+
         if (jaar > extraJaren && cumulatieveExtraInleg > 0 && kanNogKopen) {
             forceerGebruikExtraInleg = true;
             console.log(`Jaar ${jaar}: Forceer gebruik van resterende extra inleg: €${Math.round(cumulatieveExtraInleg)}`);
@@ -835,49 +856,49 @@ function berekenProjectie(
             forceerGebruikExtraInleg = true;
             console.log(`Jaar ${jaar}: Forceer aankoop wegens ruim voldoende kapitaal: €${Math.round(beschikbaarVoorInvestering)}`);
         }
-        
+
         // Alleen investeren als het een aankoopmoment is EN er genoeg kapitaal is
         // EN het jaar is niet hoger dan het laatsteAankoopjaar
         // OF als we het gebruik van extra inleg forceren
-        if ((isAankoopMoment && beschikbaarVoorInvestering >= benodigdEigenVermogenPerPand && kanNogKopen) || 
+        if ((isAankoopMoment && beschikbaarVoorInvestering >= benodigdEigenVermogenPerPand && kanNogKopen) ||
             (forceerGebruikExtraInleg && kanNogKopen)) {
-            
+
             console.log(`Jaar ${jaar}: Nieuwe panden aankopen!${forceerGebruikExtraInleg ? ' (Geforceerde investering)' : ''}`);
-            
+
             // Zorg dat we minimaal 1 pand kopen als we forceren, en maximaal 10 per keer
             // maar wel zoveel mogelijk binnen die limiet als er voldoende kapitaal is
             const aantalNieuwePanden = Math.min(10, Math.floor(beschikbaarVoorInvestering / benodigdEigenVermogenPerPand));
-            
+
             // Bereken hoeveel nieuwe panden we kunnen kopen
             const gebruiktInvesteringsbedrag = aantalNieuwePanden * benodigdEigenVermogenPerPand;
             const nieuweInvestering = aantalNieuwePanden * gemiddeldePandwaarde;
-            
+
             // Definieer één keer het aankoopbedrag voor gebruik in arrays en logs
             aankoopbedrag = gebruiktInvesteringsbedrag;
-            
+
             // Voeg nieuwe panden toe
             huidigeVastgoedwaarde += nieuweInvestering;
             huidigHypotheek += nieuweInvestering * ltv; // Verhoog hypotheek ALLEEN bij nieuwe aankopen
             huidigAantalPanden += aantalNieuwePanden;
-            
+
             // Reset cumulatieven en behoud eventueel resterende fondsen
             const resterendBedrag = beschikbaarVoorInvestering - gebruiktInvesteringsbedrag;
-            
+
             // Bereken hoeveel van de cashflow is gebruikt voor vastgoed op basis van proporties
             const proportieOverwaarde = cumulatieveOverwaarde / beschikbaarVoorInvestering;
             const proportieNietGebruikteCashflow = huidigNietGebruikteCashflow / beschikbaarVoorInvestering;
             const proportieExtraInleg = cumulatieveExtraInleg / beschikbaarVoorInvestering;
-            
+
             // Bereken hoeveel van elke bron is gebruikt voor de aankoop
             const cashflowGebruiktVoorVastgoed = Math.round(gebruiktInvesteringsbedrag * proportieNietGebruikteCashflow);
             const overwaardeGebruiktVoorVastgoed = Math.round(gebruiktInvesteringsbedrag * proportieOverwaarde);
             const extraInlegGebruiktVoorVastgoed = Math.round(gebruiktInvesteringsbedrag * proportieExtraInleg);
-            
+
             // Verdeel het resterende bedrag proportioneel tussen overwaarde en niet-gebruikte cashflow            
             cumulatieveOverwaarde = Math.round(resterendBedrag * proportieOverwaarde);
             huidigNietGebruikteCashflow = Math.round(resterendBedrag * proportieNietGebruikteCashflow);
             cumulatieveExtraInleg = Math.round(resterendBedrag * proportieExtraInleg);
-            
+
             // Gedetailleerde logging van de aankoop
             console.log(`Jaar ${jaar}: Aankoop details:
             - Aangekocht: ${aantalNieuwePanden} panden voor €${Math.round(gebruiktInvesteringsbedrag)}
@@ -885,10 +906,10 @@ function berekenProjectie(
             - Gebruikt uit overwaarde: €${overwaardeGebruiktVoorVastgoed}  
             - Gebruikt uit extra inleg: €${extraInlegGebruiktVoorVastgoed}
             - Resterend: €${Math.round(resterendBedrag)} (waarvan €${Math.round(cumulatieveExtraInleg)} extra inleg)`);
-            
+
             // Herbereken inkomen met nieuwe panden
             nieuweHuur = huidigeVastgoedwaarde * huurrendement * Math.pow(1 + huurstijging, jaar - 1);
-            nieuweKosten = huidigeVastgoedwaarde * kostenstijging;
+            nieuweKosten = huidigeVastgoedwaarde * kostenPercentage;
             nieuweRente = huidigHypotheek * rentePercentage;
             nieuwNettoInkomen = Math.round(nieuweHuur - nieuweKosten - nieuweRente);
         } else {
@@ -899,14 +920,14 @@ function berekenProjectie(
                 // cumulatieveOverwaarde blijft gewoon bestaan, maar wordt niet meer gebruikt voor aankopen
                 console.log(`Jaar ${jaar}: Na laatste aankoopjaar. Overwaarde (€${Math.round(waardestijgingBedrag)}) blijft in vastgoed.`);
             }
-            
+
             // De hypotheek blijft gelijk als er geen nieuwe aankopen zijn
             // (huidigHypotheek wijzigt niet)
-            
+
             // Geen cashflow gebruikt voor vastgoed in dit jaar
             cashflowGebruiktVoorVastgoed = 0;
         }
-        
+
         // Extra inleg voor dit jaar - wordt aan het EINDE van het jaar toegevoegd
         extraInlegDitJaar = 0;
         if (jaar <= extraJaren) {
@@ -914,21 +935,21 @@ function berekenProjectie(
         }
 
         cumulatieveExtraInleg += extraInlegDitJaar;
-        
+
         // Update eigen vermogen met overwaarde, niet-gebruikte cashflow, en cumulatieve extra inleg
         // De hypotheek wordt niet verlaagd door extra inleg, die wordt alleen gebruikt voor nieuwe panden
         huidigEigenVermogen = huidigeVastgoedwaarde - huidigHypotheek + huidigNietGebruikteCashflow + cumulatieveExtraInleg;
-        
+
         // ROE berekenen (Return on Equity)
         // We gebruiken het eigen vermogen van het vorige jaar uit de projectie array
         // Haal het meest recente element op uit de array (projectie.length - 1 geeft de 0-based index van het laatste item)
         const vorigJaarIndex = projectie.length - 1;
         const vorigEigenVermogen = projectie[vorigJaarIndex].eigenVermogen;
         const roe = Math.round((nieuwNettoInkomen / vorigEigenVermogen) * 100 * 10) / 10;
-        
+
         // Totaal rendement berekenen (ROE + waardestijging %)
         const totaalRendement = Math.round((roe + waardestijging * 100) * 10) / 10;
-        
+
         // Voeg resultaten toe voor dit jaar
         projectie.push({
             jaar: jaar,
@@ -947,6 +968,6 @@ function berekenProjectie(
             cumulatieveExtraInleg: cumulatieveExtraInleg
         });
     }
-    
+
     return projectie;
-            }
+}
