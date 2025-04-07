@@ -329,21 +329,41 @@ document.addEventListener('DOMContentLoaded', function () {
                     const thead = document.createElement('thead');
                     thead.innerHTML = `
                         <tr style="background-color: #f2f2f2;">
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Jaar</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Inleg</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Vastgoedwaarde</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Hypotheek</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Aantal panden</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Netto inkomen/mnd</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Eigen in vastgoed</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Eigen vermogen</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Vermogensgroei</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Inkomen - Minimum</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">ROE</th>
-                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;">Totaal rendement</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Jaar</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Inleg</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Vastgoedwaarde</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Hypotheek</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Aantal panden</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #d1ecc0;" colspan="4">Inkomsten, Kosten & Cashflow (per maand)</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Eigen in vastgoed</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Eigen vermogen</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Vermogensgroei</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">ROE</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center;" rowspan="2">Totaal rendement</th>
+                        </tr>
+                        <tr style="background-color: #f2f2f2;">
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #e2f4d5;">Huurinkomsten</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #f9d9d9;">Kosten</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #d1e0f0;">Netto</th>
+                            <th style="border: 1px solid #ddd; padding: 8px; text-align: center; background-color: #ffeeba;">Cashflow</th>
                         </tr>
                     `;
                     table.appendChild(thead);
+                    
+                    // Parameters ophalen voor berekeningen
+                    const startEigenVermogen = parseFloat(startEigenVermogenInput?.value || 0);
+                    const pandwaarde = parseFloat(pandwaardeInput?.value || 0);
+                    const ltv = parseFloat(ltvVermogensgroeiInput?.value || 0) / 100;
+                    const rentePercentage = parseFloat(rentePercentageVermogensgroeiInput?.value || 0) / 100;
+                    const huurrendement = parseFloat(huurrendementVermogensgroeiInput?.value || 0) / 100;
+                    const huurstijging = parseFloat(huurstijgingVermogensgroeiInput?.value || 0) / 100;
+                    const kostenPercentage = parseFloat(kostenPercentageVermogensgroeiInput?.value || 0) / 100;
+                    const waardestijging = parseFloat(waardestijgingVermogensgroeiInput?.value || 0) / 100;
+                    const extraInlegBedrag = parseFloat(extraInlegBedragInput?.value || 0);
+                    const extraInlegJaren = parseInt(extraInlegJarenInput?.value || 0);
+                    const aankoopFrequentie = parseInt(aankoopFrequentieInput?.value || 3);
+                    const minimaalInkomen = parseFloat(minimaalInkomenInput?.value || 0);
+                    const minimaalInkomenInflatie = parseFloat(minimaalInkomenInflatieInput?.value || 0) / 100;
                     
                     // Voeg de tabeldata toe
                     const tbody = document.createElement('tbody');
@@ -365,14 +385,24 @@ document.addEventListener('DOMContentLoaded', function () {
                         }
                         
                         // Bereken minimaal inkomen voor dit jaar
-                        const minimaalInkomen = parseFloat(minimaalInkomenInput?.value || 0);
-                        const minimaalInkomenInflatie = parseFloat(minimaalInkomenInflatieInput?.value || 0) / 100;
                         const minimaalInkomenDitJaar = jaar.jaar === 1 ? 
                             minimaalInkomen : 
                             minimaalInkomen * Math.pow(1 + minimaalInkomenInflatie, jaar.jaar - 1);
                         
                         const nettoInkomenPerMaand = jaar.nettoInkomen ? Math.round(jaar.nettoInkomen / 12) : 0;
                         
+                        // Bereken de waarden voor de tabel
+                        const huurStijgingFactor = jaar.jaar === 1 ? 1 : Math.pow(1 + huurstijging, jaar.jaar - 1);
+                        const huurInkomstenPerJaar = jaar.vastgoedwaarde * huurrendement * huurStijgingFactor;
+                        const huurInkomstenPerMaand = huurInkomstenPerJaar / 12;
+                        const kostenPerJaar = (jaar.vastgoedwaarde * kostenPercentage) + (jaar.hypotheek * rentePercentage);
+                        const kostenPerMaand = kostenPerJaar / 12;
+
+                        // Bereken minimaal inkomen voor maandelijkse cashflow berekening
+                        const minimaalInkomenPerMaand = minimaalInkomenDitJaar;
+                        const cashflowPerMaand = jaar.jaar !== "START" && jaar.nettoInkomen ? 
+                            Math.round(jaar.nettoInkomen / 12) - minimaalInkomenPerMaand : 0;
+
                         // Opmaak voor de rij
                         row.innerHTML = `
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${jaar.jaar}</td>
@@ -380,11 +410,13 @@ document.addEventListener('DOMContentLoaded', function () {
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatBedrag(jaar.vastgoedwaarde || 0)}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatBedrag(jaar.hypotheek || 0)}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: center;">${jaar.aantalPanden || 0}</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${jaar.nettoInkomen ? formatBedrag(nettoInkomenPerMaand) : '-'}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #e2f4d5;">${jaar.jaar !== "START" ? formatBedrag(huurInkomstenPerMaand) : '-'}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #f9d9d9;">${jaar.jaar !== "START" ? formatBedrag(kostenPerMaand) : '-'}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #d1e0f0; font-weight: bold;">${jaar.nettoInkomen ? formatBedrag(nettoInkomenPerMaand) : '-'}</td>
+                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right; background-color: #ffeeba; font-weight: bold;">${jaar.jaar !== "START" ? cashflowPerMaand > 0 ? formatBedrag(cashflowPerMaand) : formatBedrag(0) : '-'}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatBedrag(eigenInVastgoed || 0)}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${formatBedrag(jaar.eigenVermogen || 0)}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${index > 0 ? formatBedrag(vermogensgroei) : '-'}</td>
-                            <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${jaar.cashflowDitJaar ? formatBedrag(jaar.cashflowDitJaar) : '-'}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${jaar.roe ? `${jaar.roe.toFixed(1)}%` : '-'}</td>
                             <td style="border: 1px solid #ddd; padding: 8px; text-align: right;">${jaar.totaalRendement ? `${jaar.totaalRendement.toFixed(1)}%` : '-'}</td>
                         `;
@@ -405,19 +437,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     jaarDetailsTitle.textContent = 'Gedetailleerde uitleg per jaar';
                     jaarDetailsTitle.style.marginBottom = '20px';
                     jaarDetailsSection.appendChild(jaarDetailsTitle);
-                    
-                    // Parameters ophalen voor berekeningen
-                    const startEigenVermogen = parseFloat(startEigenVermogenInput?.value || 0);
-                    const pandwaarde = parseFloat(pandwaardeInput?.value || 0);
-                    const ltv = parseFloat(ltvVermogensgroeiInput?.value || 0) / 100;
-                    const rentePercentage = parseFloat(rentePercentageVermogensgroeiInput?.value || 0) / 100;
-                    const huurrendement = parseFloat(huurrendementVermogensgroeiInput?.value || 0) / 100;
-                    const huurstijging = parseFloat(huurstijgingVermogensgroeiInput?.value || 0) / 100;
-                    const kostenPercentage = parseFloat(kostenPercentageVermogensgroeiInput?.value || 0) / 100;
-                    const waardestijging = parseFloat(waardestijgingVermogensgroeiInput?.value || 0) / 100;
-                    const extraInlegBedrag = parseFloat(extraInlegBedragInput?.value || 0);
-                    const extraInlegJaren = parseInt(extraInlegJarenInput?.value || 0);
-                    const aankoopFrequentie = parseInt(aankoopFrequentieInput?.value || 3);
                     
                     // Voeg uitleg toe voor elk jaar
                     projectie.forEach((jaar, index) => {
@@ -494,20 +513,41 @@ document.addEventListener('DOMContentLoaded', function () {
                                         <li>Totaal eigen vermogen: ${formatBedrag(jaar.eigenVermogen)}</li>
                                     </ul>
                                     
-                                    <p><strong>Inkomsten en cashflow:</strong></p>
+                                    <p><strong>Inkomsten, kosten en cashflow berekening:</strong></p>
+                                    
+                                    <p><u>1. INKOMSTEN (Huur)</u></p>
                                     <ul>
-                                        <li>Huurberekening: Vastgoedwaarde × Huurrendement ${jaar.jaar > 1 ? '× (1 + Huurstijging)^(jaar-1)' : ''}</li>
                                         ${jaar.jaar > 1 ? 
-                                        `<li>Huurstijgingsfactor: ${(huurstijging * 100).toFixed(1)}% per jaar, cumulatief na ${jaar.jaar-1} jaar: ${(huurStijgingFactor * 100).toFixed(2)}%</li>` :
-                                        `<li>Huurstijging: In jaar 1 is er nog geen cumulatieve huurstijging</li>`}
-                                        <li>Huurinkomsten per pand: ${formatBedrag(pandwaarde)} × ${(huurrendement * 100).toFixed(1)}% ${jaar.jaar > 1 ? `× ${huurStijgingFactor.toFixed(4)}` : ''} = ${formatBedrag(huurPerPand)} per jaar</li>
-                                        <li>Onderhoudskosten per pand: ${formatBedrag(kostenPerPand)} per jaar (${(kostenPercentage * 100).toFixed(1)}% van pandwaarde)</li>
-                                        <li>Hypotheeklasten per pand: ${formatBedrag(hypotheekLastenPerPand)} per jaar (${(rentePercentage * 100).toFixed(1)}% rente over ${(ltv * 100).toFixed(0)}% LTV)</li>
-                                        <li>Netto inkomen per pand: ${formatBedrag(nettoPerPand)} per jaar</li>
-                                        <li>Totaal netto inkomen: ${formatBedrag(jaar.nettoInkomen || 0)} per jaar (${formatBedrag(jaar.nettoInkomen / 12)} per maand)</li>
+                                        `<li>Huurstijgingsfactor: ${(huurstijging * 100).toFixed(1)}% per jaar, cumulatief na ${jaar.jaar-1} jaar: ${(huurStijgingFactor * 100).toFixed(2)}%</li>
+                                        <li>Formule: Vastgoedwaarde × Huurrendement × (1 + Huurstijging)^(jaar-1)</li>` :
+                                        `<li>In jaar 1 is er nog geen cumulatieve huurstijging, dus factor = 1</li>
+                                        <li>Formule: Vastgoedwaarde × Huurrendement</li>`}
+                                        <li>Berekening: ${formatBedrag(jaar.vastgoedwaarde)} × ${(huurrendement * 100).toFixed(1)}% ${jaar.jaar > 1 ? `× ${huurStijgingFactor.toFixed(4)}` : ''} = ${formatBedrag(jaar.vastgoedwaarde * huurrendement * huurStijgingFactor)}</li>
+                                        <li><strong>Totale huurinkomsten: ${formatBedrag(jaar.vastgoedwaarde * huurrendement * huurStijgingFactor)} per jaar</strong></li>
+                                    </ul>
+                                    
+                                    <p><u>2. KOSTEN</u></p>
+                                    <ul>
+                                        <li>Onderhoudskosten: ${formatBedrag(jaar.vastgoedwaarde * kostenPercentage)} per jaar (${(kostenPercentage * 100).toFixed(1)}% van vastgoedwaarde)</li>
+                                        <li>Hypotheeklasten: ${formatBedrag(jaar.hypotheek * rentePercentage)} per jaar (${(rentePercentage * 100).toFixed(1)}% rente)</li>
+                                        <li><strong>Totale kosten: ${formatBedrag((jaar.vastgoedwaarde * kostenPercentage) + (jaar.hypotheek * rentePercentage))} per jaar</strong></li>
+                                    </ul>
+                                    
+                                    <p><u>3. NETTO INKOMEN (Inkomsten - Kosten)</u></p>
+                                    <ul>
+                                        <li>Formule: Huurinkomsten - Onderhoudskosten - Hypotheeklasten</li>
+                                        <li>Berekening: ${formatBedrag(jaar.vastgoedwaarde * huurrendement * huurStijgingFactor)} - ${formatBedrag(jaar.vastgoedwaarde * kostenPercentage)} - ${formatBedrag(jaar.hypotheek * rentePercentage)} = ${formatBedrag(jaar.nettoInkomen || 0)}</li>
+                                        <li><strong>Netto inkomen: ${formatBedrag(jaar.nettoInkomen || 0)} per jaar (${formatBedrag(jaar.nettoInkomen / 12)} per maand)</strong></li>
+                                    </ul>
+                                    
+                                    <p><u>4. CASHFLOW (Netto Inkomen - Minimaal benodigd inkomen)</u></p>
+                                    <ul>
                                         <li>Minimaal benodigd inkomen: ${formatBedrag(minimaalInkomenDitJaar * 12)} per jaar (${formatBedrag(minimaalInkomenDitJaar)} per maand)</li>
-                                        <li>Beschikbare cashflow: ${formatBedrag(jaar.cashflowDitJaar || 0)} per jaar</li>
-                                        ${jaar.cashflowGebruiktVoorVastgoed > 0 ? `<li>Cashflow gebruikt voor vastgoed: ${formatBedrag(jaar.cashflowGebruiktVoorVastgoed)}</li>` : ''}
+                                        <li>Formule: Netto inkomen - Minimaal benodigd inkomen</li>
+                                        <li>Berekening: ${formatBedrag(jaar.nettoInkomen || 0)} - ${formatBedrag(minimaalInkomenDitJaar * 12)} = ${formatBedrag(jaar.cashflowDitJaar || 0)}</li>
+                                        <li><strong>Beschikbare cashflow: ${formatBedrag(jaar.cashflowDitJaar || 0)} per jaar</strong></li>
+                                        ${jaar.cashflowGebruiktVoorVastgoed > 0 ? `<li>Hiervan is ${formatBedrag(jaar.cashflowGebruiktVoorVastgoed)} gebruikt voor de aankoop van vastgoed</li>` : ''}
+                                        ${jaar.overwaardeGebruiktVoorVastgoed > 0 ? `<li>Daarnaast is ${formatBedrag(jaar.overwaardeGebruiktVoorVastgoed)} aan overwaarde vrijgemaakt via herfinanciering voor vastgoedaankoop</li>` : ''}
                                     </ul>
                                     
                                     <p><strong>Rendement:</strong></p>
