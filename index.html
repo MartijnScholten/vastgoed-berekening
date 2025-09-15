@@ -63,9 +63,7 @@
         <div class="tab-navigation">
             <button class="tab-button active" data-tab="vermogensgroei">Vermogensgroei & Inkomen</button>
             <button class="tab-button" data-tab="scenario">Scenario Analyse</button>
-            <button class="tab-button" id="exportPdfBtn" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
-                Exporteer als PDF
-            </button>
+            <button id="exportPdfBtn" type="button" class="button">Exporteer als PDF</button>
             
         </div>
 
@@ -157,18 +155,18 @@
                             <table>
                                 <thead>
                                     <tr>
-                                        <th>Huur %</th>
-                                        <th>Kosten %</th>
-                                        <th>Huur €</th>
-                                        <th>Hypo €</th>
-                                        <th>Onderh €</th>
-                                        <th>Rente EV €</th>
-                                        <th>Vpb €</th>
-                                        <th>Netto €</th>
-                                        <th>Netto/mnd €</th>
-                                        <th>Waarde €</th>
-                                        <th>ROE %</th>
-                                        <th>ROE+ %</th>
+                                        <th data-tooltip="Bruto huurrendement op totale vastgoedwaarde per jaar">Huur %</th>
+                                        <th data-tooltip="Onderhoud/verzekeringen/belastingen als % van vastgoedwaarde">Kosten %</th>
+                                        <th data-tooltip="Jaarlijkse huurinkomsten">Huur €</th>
+                                        <th data-tooltip="Jaarlijkse hypotheekrente">Hypo €</th>
+                                        <th data-tooltip="Jaarlijkse onderhoudskosten">Onderh €</th>
+                                        <th data-tooltip="Rente privé (indien van toepassing)">Rente EV €</th>
+                                        <th data-tooltip="Vennootschapsbelasting (alleen bij holding)">Vpb €</th>
+                                        <th data-tooltip="Netto jaarinkomen">Netto €</th>
+                                        <th data-tooltip="Netto maandinkomen">Netto/mnd €</th>
+                                        <th data-tooltip="Totale vastgoedwaarde">Waarde €</th>
+                                        <th data-tooltip="Return on Equity = Netto / EV × 100%">ROE %</th>
+                                        <th data-tooltip="ROE + waardestijging (%)">ROE+ %</th>
                                     </tr>
                                 </thead>
                                 <tbody id="scenarioTabel">

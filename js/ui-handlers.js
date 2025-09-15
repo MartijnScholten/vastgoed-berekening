@@ -13,8 +13,8 @@ document.addEventListener('DOMContentLoaded', function () {
             const eigenVermogenInput = document.getElementById('eigenVermogen');
             const ltvInput = document.getElementById('ltv');
             const rentePercentageInput = document.getElementById('rentePercentage');
-            const vennootschapsbelastingInput = 0.198;
-            const rentePriveInput = rentePercentageInput;
+            const vennootschapsbelastingInput = document.getElementById('vennootschapsbelasting');
+            const rentePriveInput = document.getElementById('rentePrive');
             const structuurSelect = document.getElementById('structuur');
             const holdingInstellingen = document.getElementById('holdingInstellingen');
 
@@ -75,7 +75,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     ltv: ltvInput?.value,
                     rentePercentage: rentePercentageInput?.value,
                     structuur: structuurSelect?.value,
-                    waardestijging: document.getElementById('waardestijging')?.value
+                    waardestijging: document.getElementById('waardestijging')?.value,
+                    vennootschapsbelasting: vennootschapsbelastingInput?.value,
+                    rentePrive: rentePriveInput?.value
                 };
                 localStorage.setItem('scenarioWaarden', JSON.stringify(waarden));
             }
@@ -85,8 +87,8 @@ document.addEventListener('DOMContentLoaded', function () {
             if (scenarioWaarden.eigenVermogen && eigenVermogenInput) eigenVermogenInput.value = scenarioWaarden.eigenVermogen;
             if (scenarioWaarden.ltv && ltvInput) ltvInput.value = scenarioWaarden.ltv;
             if (scenarioWaarden.rentePercentage && rentePercentageInput) rentePercentageInput.value = scenarioWaarden.rentePercentage;
-            if (scenarioWaarden.vennootschapsbelasting) vennootschapsbelastingInput.value = scenarioWaarden.vennootschapsbelasting;
-            if (scenarioWaarden.rentePrive) rentePriveInput.value = scenarioWaarden.rentePrive;
+            if (scenarioWaarden.vennootschapsbelasting && vennootschapsbelastingInput) vennootschapsbelastingInput.value = scenarioWaarden.vennootschapsbelasting;
+            if (scenarioWaarden.rentePrive && rentePriveInput) rentePriveInput.value = scenarioWaarden.rentePrive;
             if (scenarioWaarden.structuur && structuurSelect) structuurSelect.value = scenarioWaarden.structuur;
             
             const waardestijgingEl = document.getElementById('waardestijging');
@@ -135,7 +137,15 @@ document.addEventListener('DOMContentLoaded', function () {
             }
 
             // Event listeners voor scenario inputs met veilige null-checks
-            const scenarioInputs = [eigenVermogenInput, ltvInput, rentePercentageInput, document.getElementById('waardestijging')].filter(Boolean);
+            const scenarioInputs = [
+                eigenVermogenInput,
+                ltvInput,
+                rentePercentageInput,
+                document.getElementById('waardestijging'),
+                vennootschapsbelastingInput,
+                rentePriveInput,
+                structuurSelect
+            ].filter(Boolean);
             scenarioInputs.forEach(input => {
                 input.addEventListener('change', () => {
                     const resultaten = berekenScenarioResultaten();
@@ -147,6 +157,25 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                     saveScenarioWaarden();
                 });
+            });
+
+            // Clamp alle number inputs binnen min/max grenzen
+            function clampNumberInput(inputEl) {
+                if (!inputEl) return;
+                const min = inputEl.min !== '' ? parseFloat(inputEl.min) : undefined;
+                const max = inputEl.max !== '' ? parseFloat(inputEl.max) : undefined;
+                let value = inputEl.value === '' ? '' : parseFloat(inputEl.value);
+                if (value === '') return;
+                if (!isNaN(value)) {
+                    if (typeof min === 'number' && value < min) value = min;
+                    if (typeof max === 'number' && value > max) value = max;
+                    inputEl.value = String(value);
+                }
+            }
+
+            document.querySelectorAll('input[type="number"]').forEach((el) => {
+                el.addEventListener('blur', () => clampNumberInput(el));
+                el.addEventListener('change', () => clampNumberInput(el));
             });
 
             // Event listeners voor vermogensgroei inputs met veilige null-checks
